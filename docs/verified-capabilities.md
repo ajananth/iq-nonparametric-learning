@@ -89,9 +89,10 @@ There are **three documented, complementary paths**, and the flagship one is *na
   > capacity with **Microsoft Fabric enabled**"*. The **Features by SKU and Capacity** feature-parity list
   > (`ms.date` 2026-06-30) does **not** carve ontology out as F-SKU-only. Because the primary source
   > **confirms P1+ (with Fabric enabled)**, the F2-only correction was **not forced** — primary-source
-  > verification decides (Art. I.2/I.5). **Discrepancy flagged to the master** for SME reconciliation; if a
-  > more specific ontology-authoring page later restricts to F-SKUs, revise here with that citation.
-  > For the demo we standardise on **F2+** as the recommended, unambiguous target (see `PREREQUISITES.md`).
+  > verification decides (Art. I.2/I.5).
+  > **RESOLVED (2026-07-03):** project decision — standardise on **F-SKU (F2+)** as the recommended/supported
+  > capacity for this demo; P1+ remains **technically valid per the primary source** but is **out of scope**.
+  > This is a scoping recommendation, **not a capability claim** (we do not assert P1+ is unsupported).
 - **Tenant settings (Fabric admin):** **"Enable Ontology item (preview)"** is required; the **Graph** tenant
   setting is required for the graph feature; **Fabric data agent** / **operations agent** tenant settings are
   required only if consuming the ontology through those agents. *(overview-tenant-settings)*
