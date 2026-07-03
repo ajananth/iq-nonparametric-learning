@@ -1,0 +1,43 @@
+# Secrets & environment — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+**/appsettings.local.json
+
+# Real / customer data — never commit (synthetic fixtures are allowed under data/fixtures/)
+data/real/
+*.xlsx
+*.csv
+!data/fixtures/**
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+
+# Azure / azd
+.azure/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local working context (not for the public repo)
+.context/
