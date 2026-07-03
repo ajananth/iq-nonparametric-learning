@@ -61,14 +61,20 @@ Microsoft Learn docs before publishing. This is **Phase 0** and gates everything
 
 ## Phases & Todos
 
-### Phase −1 — Establish workspace, constitution & governance (DONE / in progress)
-- Create dedicated project folder `iq-nonparametric-learning` and seed context (source PDF text). ✔
-- Author `CONSTITUTION.md` (hard rules incl. orchestration, plan-before-implement, GitHub Epic→Issue→PR
-  traceability) and get user sign-off on the rules.
-- Designate **this** as the **master (orchestrator) session**; child sessions are spawned per workstream.
-- Create the GitHub repo (**private** initially) to host epics/issues/PRs; create the top-level **Epic(s)**
-  mirroring the phases below. Repo goes public only at the publication approval gate.
-- Move plan, constitution, and context into the dedicated workspace.
+### Phase −1 — Establish workspace, constitution & governance (DONE)
+- Dedicated project folder `iq-nonparametric-learning` created and context seeded. ✔
+- `CONSTITUTION.md` authored (13 articles incl. orchestration, plan-before-implement, Epic→Issue→PR)
+  and user-approved. ✔
+- This designated the **master (orchestrator) session** ("IQ NPL — Master"). ✔
+- Private GitHub repo created: **github.com/ajananth/iq-nonparametric-learning** (initial commit pushed). ✔
+- Top-level **Epics** created (issues #1–#7):
+  - #1 EPIC A — Governance & repo scaffolding (Phases −1, 2)
+  - #2 EPIC B — Feasibility validation & article narrative (Phases 0, 1)
+  - #3 EPIC C — Water-utility semantic layer in Fabric IQ (Phases 3, 4)
+  - #4 EPIC D — Foundry agent harness (Phase 5)
+  - #5 EPIC E — Non-parametric optimization loop (Phase 6)
+  - #6 EPIC F — Model swappability experiment (Phase 7)
+  - #7 EPIC G — Article write-up & publication (Phase 8)
 
 > **Governance rule for every phase below:** each todo is delivered as **Issue → PR** under its phase
 > **Epic**, planned and user-approved before implementation, per Articles XI–XIII.
