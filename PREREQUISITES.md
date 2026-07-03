@@ -24,12 +24,12 @@ any Fabric/Foundry provisioning as part of Phase 2.
   **Fabric IQ (preview) workload**; a paid **F2+** capacity is the baseline we standardise on.
   - **On the P1+/Premium question (important):** the current primary source (**Use Ontology MCP Server**,
     Microsoft Learn, `updated_at` 2026-06-30) *also* lists **Power BI Premium per-capacity `P1` or higher
-    with Microsoft Fabric enabled** as a valid alternative, and the **Features by SKU and Capacity**
-    feature-parity list does not carve ontology out as F-SKU-only. The project SME asserts that **P1+ does
-    not support ontologies**; per **Art. I** we did **not** override the primary source, so this is recorded
-    as an **open discrepancy** (see `docs/verified-capabilities.md` §1c re-verification note). **Recommendation
-    for this demo: use `F2+`** to avoid the ambiguity entirely. Do not rely on P1+ until the SME/primary-source
-    conflict is reconciled.
+    with Microsoft Fabric enabled** as technically valid, and the **Features by SKU and Capacity**
+    feature-parity list does not carve ontology out as F-SKU-only. **Resolution (2026-07-03):** this demo
+    standardises on **F-SKU (F2+)**. P1+ remains **technically valid per the primary source** but is
+    **out of scope** for this project — **F-SKU only** (see `docs/verified-capabilities.md` §1c re-verification
+    note). This is a deliberate scoping recommendation for clarity and consistency, **not** a claim that P1+
+    is unsupported.
   - Trial capacities are **not** assumed to support these preview features.
 - **Workspace** assigned to that F2+ capacity, in which the ontology (preview) item and its bound OneLake
   sources (Lakehouse / Eventhouse / Power BI semantic model) will live.
@@ -134,7 +134,7 @@ require a **manual graph refresh**. *(verified-capabilities.md §1a; risk G3/G4)
 
 | # | Prerequisite | Status | Source (verified-capabilities.md) |
 | --- | --- | --- | --- |
-| 1 | Paid **F2+** Fabric capacity (recommended; P1+ is an open discrepancy) | `Verified-Preview` | §1, §1c |
+| 1 | Paid **F2+** Fabric capacity (F-SKU only; P1+ out of scope) | `Verified-Preview` | §1, §1c |
 | 2 | Fabric **workspace** on that capacity | `Verified-Preview` | §1c |
 | 3 | Tenant settings: **Enable Ontology item (preview)** + **Graph in Microsoft Fabric** | `Verified-Preview` | §1c |
 | 4 | Foundry **project** + ≥1 **GPT-5-family model deployment** | `Verified-Preview` | §2 |
