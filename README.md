@@ -25,7 +25,8 @@ This project is governed by [`CONSTITUTION.md`](./CONSTITUTION.md). Key hard rul
 - Every change is backed by a GitHub **Epic → Issue → PR**; merges via reviewed PRs only.
 - Nothing is made public without explicit approval.
 
-See [`docs/plan.md`](./docs/plan.md) for the phased plan.
+See [`docs/plan.md`](./docs/plan.md) for the phased plan, [`PREREQUISITES.md`](./PREREQUISITES.md) for what's
+needed to run the demo, and [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the Epic → Issue → PR workflow.
 
 ## License
 Code: MIT (see [`LICENSE`](./LICENSE)). Prose/article content: CC-BY.

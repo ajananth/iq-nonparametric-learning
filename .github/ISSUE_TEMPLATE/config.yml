@@ -1,0 +1,6 @@
+# Configure the issue-template chooser (Constitution Art. XIII: Epic → Issue → PR).
+blank_issues_enabled: false
+contact_links:
+  - name: Governance & rules
+    url: https://github.com/ajananth/iq-nonparametric-learning/blob/main/CONSTITUTION.md
+    about: Read the project constitution before filing — every change is backed by an Epic → Issue → PR.

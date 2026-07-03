@@ -1,0 +1,13 @@
+{
+  "_comment": "PLACEHOLDER baseline tool config. Tool-optimization target (docs/verified-capabilities.md §3b): the optimizer refines DESCRIPTIONS only, never type/required/defaults. The fabric_iq_preview tool is the verified Foundry tool type (§2a); server_url is a Fabric IQ MCP ontology endpoint. Real project_connection_id / server_url values come from config/env (.env), never committed (Art. VI). Phase 5 finalises wiring.",
+  "tools": [
+    {
+      "type": "fabric_iq_preview",
+      "server_label": "fabric_iq_ontology",
+      "description": "Query the Fabric IQ ontology (preview) for the water-utility domain. Ask in business terms about entities (WaterSource, WaterTreatmentPlant, AlgalMonitoringStation, WaterQualityMetric), their properties, and relationships (monitors, supplies, records). Returns ontology-grounded answers routed via NL2Ontology over bound OneLake sources, in the signed-in user's context.",
+      "project_connection_id": "${FOUNDRY_PROJECT_CONNECTION_ID}",
+      "server_url": "https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/${FABRIC_WORKSPACE_ID}/items/${FABRIC_ONTOLOGY_ITEM_ID}/ontologyEndpoint",
+      "require_approval": "never"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+# eval.yaml — PLACEHOLDER (verified shape from docs/verified-capabilities.md §3c)
+#
+# This mirrors the VERIFIED Agent Optimizer eval schema. Values are placeholders; the real
+# algal-bloom task dataset and criteria rubrics are authored in Phase 6. Running the optimizer
+# is GATED on allow-list access (#10); the SkillOpt fallback (§4) targets the same artifacts.
+#
+# Notes (verified §3c):
+#  - optimization_model is REQUIRED and must be one of: gpt-5, gpt-5.1, gpt-5.3.
+#  - eval_model may be any deployed chat-completion model; if it isn't deployed, scores silently return 0.
+#  - options.optimization_config.model (a list) enables the model-selection target.
+
+agent:
+  name: iq-npl-agent            # or resolved from agent.yaml / the --agent flag
+dataset_file: ./eval.jsonl
+evaluators:
+  - builtin.task_adherence      # also e.g. builtin.intent_resolution
+options:
+  eval_model: gpt-4.1-mini      # scores responses (placeholder)
+  optimization_model: gpt-5.1   # REQUIRED reflection model; generates candidates
+  max_iterations: 5             # default 4
+  optimization_config:
+    model:                      # presence enables the model-selection target (Phase 7)
+      - gpt-5.4
+      - gpt-5.4-mini
