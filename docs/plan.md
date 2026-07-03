@@ -101,6 +101,30 @@ Delivered as `docs/verified-capabilities.md` (dated 2026-07-03) via PR #9 (merge
 - Decide publish target (dev.to / Microsoft community / personal blog) and license (MIT for code,
   CC-BY for prose).
 
+### Phase 1 — Article outline & narrative spine — DONE ✅
+Delivered as `docs/article-outline.md` via PR #14 (merged), issue #13. EPIC B (#2) complete.
+- Working title: *Freeze the Model, Optimize the Harness: Non-Parametric Learning on the Microsoft IQ Stack*.
+- Thesis/hook, target audience, 10-section outline, two dedicated headline-narrative sections, a C1–C9
+  accuracy register tied to verified-capabilities.md, and honest gate/placeholder flags.
+- Publication recommendation: **Microsoft Tech Community** (primary) + **dev.to** cross-post (canonical
+  back); personal blog fallback. Licenses: code MIT, prose CC-BY. (Publication is an Art. VIII gate.)
+
+---
+
+## ⏸️ CURRENT STATE — APPROVAL / DEPENDENCY GATE (as of 2026-07-03)
+Phases −1, 0, 1 complete (all planning/validation/authoring — delivered via reviewed PRs, repo private).
+**All remaining phases (2–8) are build/implementation work.** Per **Constitution Art. XII**, implementation
+requires explicit user plan approval; several phases also have **external dependencies only the user can
+resolve**:
+- **#10 (G1)** Foundry Agent Optimizer allow-list — hard dep for Phases 6–7 (native path); SkillOpt fallback designed in.
+- Azure/Fabric infra the master session cannot provision autonomously: **Fabric F2+ capacity**, tenant
+  settings (Enable Ontology item; Graph), a **Foundry project**, and **Entra** app/identity (Phases 4–7).
+- **#12 (G5)** real-data wiring gated behind compliance review; public demo uses synthetic fixtures.
+
+**Recommended next step for the user:** approve the **Phase 2 (repo scaffold)** plan — it is low-risk,
+infra-free build work (directory skeleton, templates, `.env.example`, issue/PR templates) that can proceed
+while the optimizer allow-list request (#10) and Azure/Fabric provisioning happen in parallel.
+
 ### Phase 2 — Repo scaffold & naming
 - Repo name confirmed: **`iq-nonparametric-learning`** (private). Create public repo scaffold: README,
   LICENSE, docs/, infra/, ontology/, agent/ (.agent_configs/baseline: instructions.md, tools.json),
