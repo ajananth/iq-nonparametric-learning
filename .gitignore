@@ -1,43 +1,8 @@
-# Secrets & environment — never commit
+# Secrets & environment — never commit (Constitution Art. VI)
+# NOTE: synthetic data under data/ IS committable (Art. V) and is intentionally NOT ignored.
 .env
 .env.*
 !.env.example
-*.pem
 *.key
+*.pem
 secrets/
-**/appsettings.local.json
-
-# Real / customer data — never commit (synthetic fixtures are allowed under data/fixtures/)
-data/real/
-*.xlsx
-*.csv
-!data/fixtures/**
-
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-.env/
-*.egg-info/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Node
-node_modules/
-dist/
-build/
-.next/
-
-# Azure / azd
-.azure/
-
-# OS / editor
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-
-# Local working context (not for the public repo)
-.context/

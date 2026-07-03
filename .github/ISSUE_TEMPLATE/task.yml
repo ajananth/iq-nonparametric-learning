@@ -1,0 +1,48 @@
+name: "Task"
+description: "A specific, actionable task linked to an Epic (Constitution Art. XIII)."
+title: "<phase/area>: <short title>"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tasks are the middle of the traceability chain (Constitution **Art. XIII**): every task links to an
+        **Epic**, and the delivering **PR** links back to this task with `Closes #<n>`.
+  - type: input
+    id: epic
+    attributes:
+      label: Parent epic
+      description: The Epic issue this task belongs to (e.g. `EPIC A (#1)`).
+      placeholder: "EPIC A (#1)"
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+      description: Concrete, checkable outputs for this task.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How do we know this task is done and correct?
+    validations:
+      required: true
+  - type: textarea
+    id: deferred
+    attributes:
+      label: Explicitly deferred / out of scope
+      description: Anything intentionally NOT done in this task.
+    validations:
+      required: false
+  - type: textarea
+    id: constitution
+    attributes:
+      label: Constitution considerations
+      description: Relevant articles (e.g. Art. I citations, Art. VI secrets, Art. XIII traceability).
+    validations:
+      required: false

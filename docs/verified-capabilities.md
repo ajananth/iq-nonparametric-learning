@@ -80,7 +80,18 @@ There are **three documented, complementary paths**, and the flagship one is *na
 - **Azure RBAC (for the `fabric_iq_preview` tool):** **Foundry User** on the project (developer identity, agent
   runtime identity, and any user identity in OAuth flows) + **Foundry Project Manager** (to create the Fabric IQ
   connection). Invoking users also need a **Microsoft Fabric license** with access to the queried items. *(tools/fabric-iq)*
-- **Capacity/licensing:** paid **F2+ Fabric capacity** (or **Power BI Premium P1+** with Fabric enabled). *(how-to-use-ontology-mcp-server)*
+- **Capacity/licensing:** paid **F2+ Fabric capacity** (or **Power BI Premium per-capacity P1+** with **Microsoft Fabric enabled**). *(how-to-use-ontology-mcp-server)*
+  > **§1c re-verification note (Phase 2, #15, re-checked 2026-07-03):** The Phase 2 SME asserted that
+  > **P1+/Premium does *not* support ontologies** and requested this line be corrected to *F2+ only*. Per
+  > **Art. I**, the claim was re-checked against the primary source before changing anything. The current
+  > **Use Ontology MCP Server** prerequisites (Microsoft Learn, `updated_at` **2026-06-30**) still explicitly
+  > list *"A paid **F2** or higher Fabric capacity, **or** a **Power BI Premium per capacity (P1 or higher)**
+  > capacity with **Microsoft Fabric enabled**"*. The **Features by SKU and Capacity** feature-parity list
+  > (`ms.date` 2026-06-30) does **not** carve ontology out as F-SKU-only. Because the primary source
+  > **confirms P1+ (with Fabric enabled)**, the F2-only correction was **not forced** — primary-source
+  > verification decides (Art. I.2/I.5). **Discrepancy flagged to the master** for SME reconciliation; if a
+  > more specific ontology-authoring page later restricts to F-SKUs, revise here with that citation.
+  > For the demo we standardise on **F2+** as the recommended, unambiguous target (see `PREREQUISITES.md`).
 - **Tenant settings (Fabric admin):** **"Enable Ontology item (preview)"** is required; the **Graph** tenant
   setting is required for the graph feature; **Fabric data agent** / **operations agent** tenant settings are
   required only if consuming the ontology through those agents. *(overview-tenant-settings)*

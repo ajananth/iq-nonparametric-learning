@@ -1,0 +1,40 @@
+name: "Epic"
+description: "A high-level epic (Constitution Art. XIII: top of the Epic → Issue → PR chain)."
+title: "EPIC: <short title>"
+labels: ["epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Epics are the top of the traceability chain (Constitution **Art. XIII**). Every Issue links to an
+        Epic, and every PR links to an Issue. Please review [`CONSTITUTION.md`](../../CONSTITUTION.md).
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal / outcome
+      description: What business/technical outcome does this epic deliver?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is in scope, and explicitly what is out of scope / deferred?
+    validations:
+      required: true
+  - type: textarea
+    id: child-issues
+    attributes:
+      label: Child issues
+      description: Checklist of the issues that make up this epic (add links as they are created).
+      value: |
+        - [ ] #
+    validations:
+      required: false
+  - type: textarea
+    id: constitution
+    attributes:
+      label: Constitution considerations
+      description: Which articles are most load-bearing for this epic (e.g. Art. I accuracy, Art. VI secrets)?
+    validations:
+      required: false
