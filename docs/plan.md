@@ -79,17 +79,22 @@ Microsoft Learn docs before publishing. This is **Phase 0** and gates everything
 > **Governance rule for every phase below:** each todo is delivered as **Issue → PR** under its phase
 > **Epic**, planned and user-approved before implementation, per Articles XI–XIII.
 
-### Phase 0 — Validate feasibility against live docs (GATE)
-- Confirm Fabric IQ Ontology preview: how to author entities/relationships/bindings; how it's exposed
-  (MCP endpoint vs Foundry connector), auth model (Entra app reg, Item.Execute.All / Item.Read.All).
-- Confirm Foundry Agent Service: how to attach the Fabric IQ tool to a hosted agent.
-- Confirm Agent Optimizer: real `azd` extension, commands (`azd ai agent init/eval generate/optimize`),
-  targets (instruction / skill / tool_description / model_selection), allow-list/preview access.
-- Confirm SkillOpt repo/paper as the conceptual anchor.
-- Output: a "verified capabilities" note listing what's real, what's gated, and any gaps needing a
-  fallback (e.g. custom SkillOpt-style Python loop if native optimizer access is unavailable).
+### Phase 0 — Validate feasibility against live docs (GATE) — DONE ✅
+Delivered as `docs/verified-capabilities.md` (dated 2026-07-03) via PR #9 (merged), issue #8.
+- **Fabric IQ Ontology (preview)** — Verified-Preview. Entity/relationship/property authoring + OneLake
+  data binding (Lakehouse/Eventhouse/PBI); NL2Ontology (GQL/KQL). Binding limits noted.
+- **Foundry Agent Service grounding** — Verified-Preview. Native **`fabric_iq_preview`** tool
+  (`FabricIQPreviewTool`, azure-ai-projects≥2.2.0) **built on MCP** (server_url = Fabric IQ MCP endpoint);
+  portal Foundry IQ knowledge-base path also exists. Frozen weights by construction.
+- **Foundry Agent Optimizer** — **Gated** (real + preview, but subscription **allow-list** required; 403
+  otherwise). Verified commands/targets/eval.yaml schema; optimizer models = gpt-5/5.1/5.3. → Action #10.
+- **SkillOpt** — Verified-GA (repo + arXiv:2605.23904 + PyPI). Conceptual anchor + fallback loop.
+- **Key resolution:** "MCP vs native connector" was a false dichotomy — native tool is built on MCP.
+- **PDF corrections** recorded (tool type, azd extension, eval cmd, model-select key, model list, Entra scopes).
+- **Follow-ups:** #10 (G1 optimizer allow-list — hard dep), #11 (G2 SP Entra scopes), #12 (G5 real-data compliance gate).
+- **Carry-forward:** design Phase 6 (EPIC E) so the SkillOpt-style custom loop is a drop-in if #10 is delayed.
 
-### Phase 1 — Article outline & narrative spine
+### Phase 1 — Article outline & narrative spine (NEXT)
 - Draft article structure (problem → IQ stack → non-parametric concept → water scenario → build →
   optimization results → swappability results → takeaways).
 - Nail the demo hook / thesis (separation of concerns: Fabric IQ owns truth, Foundry swaps the brain).
