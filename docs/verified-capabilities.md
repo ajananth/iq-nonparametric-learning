@@ -145,32 +145,52 @@ There are **three documented, complementary paths**, and the flagship one is *na
 
 ## 3. Foundry Agent Optimizer (azd extension)
 
-**Status: `Gated` (Verified-Preview + subscription allow-list required)**
+**Status: `Verified-Preview` — empirically Accessible on our subscription (2026-07-03).** The preview docs still
+describe a sign-up / allow-list gate, but it was **not enforced** for us on this date.
 
-The optimizer is real, documented, and in **limited public preview**, **but subscription access is gated**:
-*"Your Azure subscription must be on the allow list for the agent optimizer. Contact your Microsoft
-representative to request access."* (A gated `optimize` call returns **403**.) This is the single biggest Phase 0
-risk and drives the fallback in §4.
+The optimizer is real, documented, and in **limited public preview**. The preview pages still carry gate language
+— the Quickstart prerequisites say *"Your Azure subscription must be on the allow list for the agent optimizer.
+Contact your Microsoft representative to request access."*, and the shipped optimization sample README describes a
+*"limited preview … intake form https://aka.ms/ao/preview-form"*. **However, in a validation spike on 2026-07-03
+this gate was not enforced on our subscription:** `azd ai agent optimize` submitted a real job
+(`Job ID: opt_2506b71b1a834c57b58c4060584310ea`, Status `queued` → `in_progress`) with **no 403 / allow-list
+rejection** (job then cancelled for cost control). *(Empirical test evidence dated 2026-07-03 — our own observation,
+not a Microsoft doc; see the evidence note below.)* We report **both** the doc gate language and the empirical
+result: the native path is viable for us today, but we do **not** claim it is ungated for everyone.
 
-**Primary sources (accessed 2026-07-03, `ms.date` 2026-05-18 unless noted):**
-- Overview — https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-optimizer-overview
+**Primary sources (accessed 2026-07-03):**
+- Overview — https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/agent-optimizer-overview *(`ms.date` 2026-05-18, updated 2026-06-24)*
+- Quickstart "Optimize a hosted agent" — https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-optimize-hosted-agent *(`ms.date` 2026-06-22, updated 2026-06-30)*
 - Optimize targets — https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/optimize-agent-targets
 - Create dataset/evaluators — https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/create-optimizer-dataset
-- Quickstart — https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/quickstart-optimize-hosted-agent
 - azd agent extension — https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/extensions/azure-ai-foundry-extension *(ms.date 2025-12-11)*
 
-### 3a. Real extension & commands — Verified
-- **Extension: `azure.ai.agents`**, installed with **`azd ext install azure.ai.agents`** (equivalently
-  `azd extension install azure.ai.agents`; auto-installs on first `azd ai agent ...` use). Requires **azd**
-  1.21.3+ and **Azure CLI** (`az login` + `azd auth login`).
+**Empirical evidence (validation spike, 2026-07-03 — our own test, not a Microsoft doc):** on our Foundry project
+(East US 2) `azd ai agent optimize` was **accepted and processed** by the service — job `opt_2506b71b1a834c57b58c4060584310ea`
+reached `in_progress` before being cancelled for cost — and `azd ai agent eval generate` ran end-to-end. This proves
+**submission → queue → execution-start**; because the job was cancelled early, **final candidate scoring was not
+observed** (that will be exercised in Phase 6). No scores are asserted here.
+
+### 3a. Real extension & commands — Verified (tooling refreshed 2026-07-03)
+- **Extension: `microsoft.foundry`** (the Foundry meta-extension), installed with
+  **`azd ext install microsoft.foundry`** (upgrade with `azd ext upgrade microsoft.foundry`). It bundles the
+  `azure.ai.agents` dependency (Quickstart requires **0.1.40-preview or later**; the spike observed
+  `microsoft.foundry` **1.0.0-beta.1** bundling `azure.ai.agents` **1.0.0-beta.2**). Requires a **recent azd**
+  (**≥ ~1.26**) and **Azure CLI** (`az login` + `azd auth login`). *(Empirical: azd **1.23.7 was rejected** with
+  "no compatible version"; **1.27.0 worked** — 2026-07-03.)* The earlier "`azure.ai.agents` / azd 1.21.3+" note is
+  **stale** — see Corrections.
 - **Commands (verified):**
   - `azd ai agent init -m <agent-definition-or-manifest-url> [.] [-p <project-resource-id>]` — scaffold; generates
     `agent.yaml`, `.agent_configs/baseline/`, dataset, and IaC (`infra/`, `azure.yaml`).
   - `azd provision` → `azd deploy` (or `azd up`) → `azd ai agent invoke "<prompt>"` — provision/deploy/smoke-test.
-  - `azd ai agent eval init [--gen-instruction "..." | --dataset <jsonl>] [--eval-model <m>] [--max-samples N]` —
-    generate a domain-tuned `eval.yaml`, dataset, and evaluators. (`azd ai agent eval run` runs the eval suite.)
-  - `azd ai agent optimize [--config eval.yaml] [--agent <name>] [--eval-model <m>] [--optimize-model <m>] [--watch]`
-    — auto-detects `eval.yaml`; runs the closed-loop optimization (~5–20 min).
+  - `azd ai agent eval generate [--gen-instruction-file <f>] [--eval-model <m>] [--max-samples N]` — generate a
+    domain-tuned `eval.yaml`, dataset, and evaluators. (`azd ai agent eval run` runs the eval suite.) *(The current
+    Quickstart uses `eval generate`; an earlier note said `eval init` — see Corrections.)*
+  - `azd ai agent optimize [--config eval.yaml] [--agent <name>] --eval-model <m> --optimize-model <m>`
+    `[--max-candidates N] [--evaluator <name> ...] [-p/--project-endpoint <ep>] [--watch]` — auto-detects `eval.yaml`;
+    runs the closed-loop optimization (~5–20 min). **Both `--eval-model` and `--optimize-model` are required** (the
+    optimize-model may instead be set as `optimization_model` under `options:` in `eval.yaml`); `--max-candidates`
+    **defaults to 5**; `--evaluator` is repeatable and required if evaluators aren't already in the config.
   - `azd ai agent optimize apply --candidate <id>` → `azd deploy` (recommended promote), or
     `azd ai agent optimize deploy --candidate <id>` (direct A/B), or `azd ai agent optimize cancel <id>`.
 - **Loop:** evaluate baseline → generate candidates → evaluate candidates → rank by composite **score (0.0–1.0)**,
@@ -185,7 +205,7 @@ Targets auto-activate from the baseline config + `eval.yaml`. An agent is **"opt
 | **Instruction tuning** | `instructions.md` | Rewrites the system prompt |
 | **Skill improvement** | `skills/` (each `SKILL.md`) | Refines skill **bodies** (descriptions unchanged); loaded via `load_config()`; open **Agent Skills** format (agentskills.io) |
 | **Tool optimization** | `tools.json` | Improves tool/parameter **descriptions** only (never types/defaults/required) |
-| **Model selection** | `options.optimization_config.model` list in `eval.yaml` | Scores the agent across multiple model deployments for quality/cost trade-off |
+| **Model selection** | `options.optimization_config.model_search_space` list in `eval.yaml` | Scores the agent across multiple model deployments for quality/cost trade-off |
 
 ### 3c. Real `eval.yaml` shape — Verified (corrects the PDF's guessed keys)
 ```yaml
@@ -200,14 +220,18 @@ options:
   optimization_model: gpt-5.1    # REQUIRED ("reflection" model); generates candidates
   max_iterations: 5              # default 4
   optimization_config:
-    model:                       # presence enables the model-selection target
+    model_search_space:          # presence enables the model-selection target
       - gpt-4.1
       - gpt-4.1-mini
       - gpt-4o
 ```
 - **Two models:** `eval_model` (`--eval-model`) scores each task/criterion (binary 0/1 for `builtin.task_adherence`);
   `optimization_model` (`--optimize-model`) generates candidates and is **required** (missing → API error).
-- **Supported `optimization_model` values (verified):** **`gpt-5`, `gpt-5.1`, `gpt-5.3`**.
+- **Supported `optimization_model` values:** must be from the **gpt-5 family or DeepSeek**. The Overview `#models`
+  table (accessed 2026-07-03) lists **`gpt-5`, `gpt-5.1`, `gpt-5.2`, `gpt-5.4`, `gpt-5.5`, `DeepSeek-V4-Pro`,
+  `DeepSeek-V-3.2`**. *(Empirical: **`gpt-5.4` was accepted** by the service in our 2026-07-03 spike.)* The earlier
+  narrower list (`gpt-5`/`gpt-5.1`/`gpt-5.3`) is superseded — see Corrections; any `eval_model` may be any deployed
+  chat-completion model.
 - **Dataset:** default built-in = **3 general coding tasks + 25 criteria**; custom datasets are **JSONL**, one
   task per line: `{"name","prompt","criteria":[{"name","instruction"}], "groundTruth"?}`.
 - **Score interpretation (verified):** <0.03 noise · 0.03–0.10 moderate (worth deploying) · 0.10–0.20 significant ·
@@ -215,6 +239,18 @@ options:
 - ⚠️ **Every dataset task invokes the agent**, executing any real tool calls — use test endpoints/mocks to avoid
   charges/state mutation (relevant to **Art. V** synthetic-fixtures discipline). If the eval model isn't deployed,
   **all scores silently return 0**.
+
+### 3d. Known beta defects (observed 2026-07-03) — empirical test evidence
+Two tooling defects were hit during the validation spike. Both are **observed in this beta build** (`microsoft.foundry`
+1.0.0-beta.1 / `azure.ai.agents` 1.0.0-beta.2) and may change; neither is documented as a limitation on the primary
+pages, so they are recorded here as our own observations, not doc-sourced claims.
+- **(a) Brownfield `azd provision` with a declared model deployment fails `InvalidTemplate`** (malformed project
+  resource name in the generated IaC). **Workaround:** don't declare the model deployment in the template / reuse an
+  existing deployment.
+- **(b) `azd ai agent optimize --no-prompt` cannot resolve the baseline instruction from config** — it errors
+  "instruction is required" even when the instruction is set. It **works interactively only**, which blocks
+  non-interactive / CI optimize runs today. *(Cf. the Quickstart troubleshooting row for `optimization_model is
+  required` in non-interactive mode — a related, separate non-interactive gap.)*
 
 ---
 
@@ -237,9 +273,11 @@ execution modes (52/52 evaluation cells)**, with **no weight updates**; multi-ba
 Qwen / MiniMax). Releases as of verification: **v0.1.0 (2026-06-02)** and **v0.2.0 (2026-07-02)** (adds
 "SkillOpt-Sleep"; Claude/Codex/Copilot/Devin/OpenClaw backends).
 
-**Role in this project:** the **conceptual anchor** for "text-space, non-parametric optimization" and the
-**fallback custom loop** if Agent Optimizer allow-list access (§3) is not granted. It targets the same text-space
-artifacts (`instructions.md`, skills, tool descriptions). Attribute correctly to Microsoft Research (**Art. VII.2**).
+**Role in this project:** the **conceptual anchor** for "text-space, non-parametric optimization" and a documented
+**fallback custom loop** should the native Agent Optimizer path (§3) be unavailable. As of the 2026-07-03 spike the
+native optimizer is **empirically accessible on our subscription**, so SkillOpt is now a **fallback, not a
+necessity**. It targets the same text-space artifacts (`instructions.md`, skills, tool descriptions). Attribute
+correctly to Microsoft Research (**Art. VII.2**).
 
 ---
 
@@ -251,23 +289,36 @@ Per **Art. I.5**, inaccuracies in the Gemini-generated source are corrected here
 2. **"MCP vs native connector" — false dichotomy; resolved as both.** The flagship native tool (`fabric_iq_preview`)
    is itself **built on MCP** (its `server_url` is a Fabric IQ MCP endpoint). There is also a portal **Foundry IQ
    knowledge base** path and a **raw ontology MCP endpoint** for any MCP client.
-3. **azd extension name — corrected.** The extension is **`azure.ai.agents`** (`azd ext install azure.ai.agents`),
-   **not** `microsoft.foundry`.
-4. **Optimizer eval command — corrected.** Dataset generation is **`azd ai agent eval init`**, not `eval generate`.
-5. **Model-selection YAML key — corrected.** The real key is **`options.optimization_config.model`** (a list of
-   deployment names), **not** `model_search` / `model_search_space`.
-6. **Supported optimization models — corrected.** Primary docs list **`gpt-5`, `gpt-5.1`, `gpt-5.3`** for
-   `optimization_model` (any deployed chat model may serve as `eval_model`). Do not publish a wider list as fact.
+3. **azd extension name — corrected, then evolved.** *(Phase 0)* the extension was `azure.ai.agents`, **not**
+   `microsoft.foundry`. **Update (2026-07-03):** the tooling has since changed — the Agent Optimizer is now installed
+   via the **`microsoft.foundry`** meta-extension (`azd ext install microsoft.foundry`), which **bundles** the
+   `azure.ai.agents` dependency. So the PDF's `microsoft.foundry` name is now the correct install target, though for a
+   different reason than it originally implied. See §3a.
+4. **Optimizer eval command — corrected, then reversed.** *(Phase 0)* dataset generation was recorded as
+   `azd ai agent eval init`. **Update (2026-07-03):** the current Quickstart (updated 2026-06-30) and our spike both
+   use **`azd ai agent eval generate`** — this reverses the Phase 0 correction. The verified command is now
+   `eval generate`. See §3a.
+5. **Model-selection YAML key — corrected, then reversed.** *(Phase 0)* the key was recorded as
+   `options.optimization_config.model` (not `model_search_space`). **Update (2026-07-03):** the current Overview page
+   shows the model-selection candidate list under **`options.optimization_config.model_search_space`** — this reverses
+   the Phase 0 correction. The verified key is now `model_search_space`. See §3b/§3c.
+6. **Supported optimization models — updated.** *(Phase 0)* primary docs listed `gpt-5`, `gpt-5.1`, `gpt-5.3`.
+   **Update (2026-07-03):** the Overview `#models` table now lists **`gpt-5`, `gpt-5.1`, `gpt-5.2`, `gpt-5.4`,
+   `gpt-5.5`, `DeepSeek-V4-Pro`, `DeepSeek-V-3.2`** (gpt-5 family **or** DeepSeek); `gpt-5.3` is no longer listed and
+   `gpt-5.4` **was empirically accepted** by the service in our spike. Any deployed chat model may serve as
+   `eval_model`. See §3c.
 7. **Entra `Item.Execute.All` / `Item.Read.All` scopes — unverified.** Documented access is **delegated user
    identity** + a **BYO Entra app via managed OAuth**, with RBAC **Foundry User** + **Foundry Project Manager**
    (see §1c/§2a). Do not publish those scope strings as fact until confirmed in the app-registration flow.
-8. **Optimizer availability — clarified.** It is **not openly available**: it is a **limited preview gated by a
-   subscription allow-list** ("contact your Microsoft representative"; 403 otherwise).
+8. **Optimizer availability — clarified, then re-tested.** *(Phase 0)* it was described as a **limited preview gated
+   by a subscription allow-list** ("contact your Microsoft representative"; 403 otherwise). **Update (2026-07-03):**
+   the docs **still carry** allow-list / intake-form language, but the gate was **empirically not enforced** on our
+   subscription — `azd ai agent optimize` submitted a real job (no 403). We report both; see §3 header.
 
 ## Gaps, risks & fallbacks (summary)
 | # | Gap / risk | Impact | Fallback |
 | --- | --- | --- | --- |
-| G1 | **Agent Optimizer is allow-list gated** (§3) | May block the native optimization demo | Request access via Microsoft rep now; else use a **SkillOpt-style custom Python loop** (§4) to demonstrate the same non-parametric loop against `instructions.md` / skills / tool descriptions |
+| G1 | **Agent Optimizer preview gating** (§3) — **RESOLVED-BY-TEST** | Native optimization demo | **Empirically accessible on our subscription (2026-07-03):** `azd ai agent optimize` submitted a real job with no 403. Preview sign-up / allow-list language persists in the docs but was **not enforced** for us. Native path viable; **SkillOpt (§4) is now a fallback, not a necessity**. (Two beta tooling defects noted in §3d; final candidate scoring to be exercised in Phase 6.) |
 | G2 | **Service-principal Entra scopes for Fabric IQ undocumented** (§1c) | Automation/CI (non-interactive) auth uncertain | Use **delegated user identity** as documented; re-verify SP scopes before publication |
 | G3 | Ontology **binding limitations** (managed tables, no OneLake security, no column mapping) | Constrains fixture design | Design Phase 3 synthetic fixtures to comply from the start |
 | G4 | Graph feature needs **tenant Graph setting**; upstream data needs **manual refresh** | Setup/latency friction | Document as prerequisites; script the refresh in the repo |
@@ -275,8 +326,12 @@ Per **Art. I.5**, inaccuracies in the Gemini-generated source are corrected here
 
 ## Gate decision
 Phase 0's verification objective is met: every load-bearing claim now carries a primary-source citation and a
-stated status. All four capabilities are real; the **only hard dependency for a fully-native build is the Agent
-Optimizer allow-list (G1)**, for which a documented SkillOpt-style fallback exists. **Recommendation to the master
-session:** (a) request allow-list access early, and (b) design the Phase 6 optimization loop so the SkillOpt-style
-path is a drop-in if access is delayed. Per **Art. XIII**, no Phase 1+ build work should begin until this note is
-merged.
+stated status. All four capabilities are real. The Phase 0 hard dependency — Agent Optimizer allow-list access (G1)
+— has been **resolved by test (2026-07-03):** the optimizer is **empirically accessible on our subscription** (a real
+`optimize` job was submitted with no 403), so the **fully-native optimization path is viable** and SkillOpt (§4)
+remains a documented fallback rather than a necessity. **Recommendation to the master session:** (a) proceed with the
+native optimizer for Phases 6–7 while keeping the SkillOpt-style path as a drop-in fallback; (b) account for the two
+beta tooling defects in §3d (brownfield `azd provision` template failure; non-interactive `optimize` instruction-
+resolution defect — run `optimize` interactively for now); and (c) exercise end-to-end candidate scoring in Phase 6
+(the spike proved submission/queue/execution-start but cancelled before scoring). Per **Art. XIII**, no Phase 1+
+build work should begin until this note is merged.
