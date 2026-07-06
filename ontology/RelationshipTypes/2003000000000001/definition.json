@@ -1,0 +1,13 @@
+{
+  "namespace": "usertypes",
+  "id": "2003000000000001",
+  "name": "dominantSpecies",
+  "description": "WaterQualityMeasurement's dominant AlgaeSpecies (bound via water_quality_measurements.dominant_species_id).",
+  "namespaceType": "Custom",
+  "source": {
+    "entityTypeId": "1003000000000001"
+  },
+  "target": {
+    "entityTypeId": "1002000000000001"
+  }
+}

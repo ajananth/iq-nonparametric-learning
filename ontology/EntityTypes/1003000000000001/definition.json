@@ -1,0 +1,99 @@
+{
+  "id": "1003000000000001",
+  "namespace": "usertypes",
+  "baseEntityTypeId": null,
+  "name": "WaterQualityMeasurement",
+  "description": "A timestamped water-quality reading at a Site.",
+  "entityIdParts": [
+    "1003000000000101"
+  ],
+  "displayNamePropertyId": "1003000000000101",
+  "namespaceType": "Custom",
+  "visibility": "Visible",
+  "properties": [
+    {
+      "id": "1003000000000101",
+      "name": "measurement_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1003000000000102",
+      "name": "site_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1003000000000103",
+      "name": "recorded_at",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "DateTime"
+    },
+    {
+      "id": "1003000000000104",
+      "name": "ph",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1003000000000105",
+      "name": "dissolved_oxygen_mgl",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1003000000000106",
+      "name": "turbidity_ntu",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1003000000000107",
+      "name": "chlorophyll_a_ugl",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1003000000000108",
+      "name": "nitrate_mgl",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1003000000000109",
+      "name": "phosphate_mgl",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1003000000000110",
+      "name": "algae_cell_count_cells_ml",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "BigInt"
+    },
+    {
+      "id": "1003000000000111",
+      "name": "dominant_species_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1003000000000112",
+      "name": "notes",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    }
+  ]
+}

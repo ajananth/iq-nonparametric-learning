@@ -27,9 +27,10 @@
 > skills), never by touching model weights.**
 
 **Demo hook (the "show me" moment):** a water-utility agent answers a cross-domain algal-bloom question
-that spans live sensor telemetry, lab assays, and asset/geospatial data — then we (a) swap the underlying
-frontier model via *config only* and watch it still work, and (b) show an *auditable text diff* of how the
-agent's instructions/tools were optimized, with the model weights provably untouched.
+that spans monitoring sites, water-quality measurements, algae-species toxicity, and treatment history —
+then we (a) swap the underlying frontier model via *config only* and watch it still work, and (b) show an
+*auditable text diff* of how the agent's instructions/tools were optimized, with the model weights provably
+untouched.
 
 ---
 
@@ -95,22 +96,32 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 
 ### S4. The scenario — a water utility responding to an algal bloom
 - Why water utilities: high-stakes, genuinely cross-domain, and relatable. **Algal blooms** (cyanobacteria)
-  produce **taste-and-odor** compounds (**MIB / Geosmin**) and **cyanotoxins**; response requires fusing:
-  - **Sensor/telemetry** (Eventhouse): phycocyanin, chlorophyll-a, turbidity, temperature — time-series.
-  - **Lab assays** (Lakehouse): cell counts, toxin concentrations, MIB/Geosmin quantification.
-  - **Asset & geospatial** (Lakehouse/semantic model): sources, treatment plants, monitoring stations,
-    PAC dosing capacity, storage, service areas.
-- The question the agent must answer spans all three domains at once — the natural fit for graph traversal.
-- **Reproducibility note (Art. V):** the public demo ships **synthetic fixtures**; real utility data wires
-  in via config only and is never committed. Fixtures are designed to respect ontology **binding limits**
-  (managed tables; no OneLake security; no column mapping). *(verified-capabilities §1a, G3.)*
+  produce **taste-and-odor** compounds and **cyanotoxins**; response requires fusing monitoring, species
+  knowledge, and past interventions across the network.
+- The demo grounds on a **real synthetic dataset** (Southeast Queensland water utility) of **4 flat tables**
+  — one **managed Delta table** each, **no medallion** (issue #20; `data/README.md`):
+  - **`sites`** — monitored water bodies (reservoir / wetland / coastal bay-lagoon) with location + status.
+  - **`algae_species`** — species with `toxicity_level` and `bloom_trigger_conditions`.
+  - **`water_quality_measurements`** — timestamped readings (`ph`, `dissolved_oxygen_mgl`, `turbidity_ntu`,
+    `chlorophyll_a_ugl`, `nitrate_mgl`, `phosphate_mgl`, `algae_cell_count_cells_ml`) linked to a site and a
+    dominant species.
+  - **`treatment_records`** — remediation actions (`method`, `dosage_or_description`, `outcome`) per site.
+- The question the agent must answer spans sites, measurements, species toxicity, and treatment history at
+  once — the natural fit for graph traversal over the ontology's typed relationships.
+- **Reproducibility note (Art. V):** the public demo ships **synthetic fixtures** (`data/`, derived from
+  `ajananth/water-quality-assistant`); real utility data wires in via config only and is never committed.
+  Fixtures are designed to respect ontology **binding limits** (managed tables; no OneLake security; no column
+  mapping). *(verified-capabilities §1a, G3.)*
 
 ### S5. Building the semantic layer in Fabric IQ
-- Model the domain as an ontology: entities (**WaterSource, WaterTreatmentPlant, AlgalMonitoringStation,
-  WaterQualityMetric**), relationships (**monitors / supplies / records**), properties (Phycocyanin,
-  Chlorophyll-a, Geosmin, MIB, cell count, PAC dosing rate, storage, capacity).
-- Bind entities to OneLake sources (Eventhouse telemetry stream; Lakehouse lab + asset tables); map
-  columns→properties, define entity keys, map keys→relationships.
+- Model the domain as an ontology: entities (**Site, AlgaeSpecies, WaterQualityMeasurement,
+  TreatmentRecord**), relationships (**hasMeasurement / hasTreatment / dominantSpecies**), properties = the
+  real CSV columns (pH, dissolved oxygen, turbidity, chlorophyll-a, nitrate, phosphate, algae cell count,
+  toxicity level, bloom triggers, treatment method/outcome). *(see `ontology/README.md`.)*
+- Bind entities to **managed Lakehouse Delta tables** (`sites`, `algae_species`,
+  `water_quality_measurements`, `treatment_records`); map columns→properties, define entity keys (each
+  `*_id`), and map foreign keys→relationships. *(Eventhouse streams and Power BI semantic models are also
+  valid binding sources per §1a, but this synthetic demo uses flat Lakehouse tables — no medallion.)*
 - Prerequisites stated honestly: **F2+ capacity** (or P1+ with Fabric), **Enable Ontology item (preview)**
   tenant setting, and **Graph in Microsoft Fabric** enabled for graph traversal; upstream row changes need
   a **manual graph refresh**. *(verified-capabilities §1a, §1c, G4.)*
@@ -173,8 +184,8 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 - **Claim:** data structure + business vocabulary live in the **ontology**, not in prompts; the agent
   queries semantics via NL2Ontology / the `fabric_iq_preview` tool, with **no raw SQL/schema coupling** in
   the harness. *(Art. IV; verified-capabilities §1, §1b, §2a.)*
-- **Cross-domain graph traversal:** one question joins stream + lab + asset via typed relationships —
-  something prompt-stuffing cannot do reliably.
+- **Cross-domain graph traversal:** one question joins sites, measurements, species toxicity, and treatment
+  history via typed relationships — something prompt-stuffing cannot do reliably.
 - **Fails safely:** because access is **delegated / identity-based**, out-of-scope or unauthorized data
   yields a structural/authorization boundary, not a confident hallucination. *(verified-capabilities §1c.)*
 - **Why it's a "contract":** the ontology is the agreed interface between the data platform and the agent;

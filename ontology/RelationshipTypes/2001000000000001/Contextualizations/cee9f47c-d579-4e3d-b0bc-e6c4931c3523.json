@@ -1,0 +1,22 @@
+{
+  "id": "cee9f47c-d579-4e3d-b0bc-e6c4931c3523",
+  "dataBindingTable": {
+    "workspaceId": "${FABRIC_WORKSPACE_ID}",
+    "itemId": "${FABRIC_LAKEHOUSE_ID}",
+    "sourceTableName": "water_quality_measurements",
+    "sourceSchema": "dbo",
+    "sourceType": "LakehouseTable"
+  },
+  "sourceKeyRefBindings": [
+    {
+      "sourceColumnName": "site_id",
+      "targetPropertyId": "1001000000000101"
+    }
+  ],
+  "targetKeyRefBindings": [
+    {
+      "sourceColumnName": "measurement_id",
+      "targetPropertyId": "1003000000000101"
+    }
+  ]
+}

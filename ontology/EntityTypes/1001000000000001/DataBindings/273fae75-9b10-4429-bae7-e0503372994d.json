@@ -1,0 +1,51 @@
+{
+  "id": "273fae75-9b10-4429-bae7-e0503372994d",
+  "dataBindingConfiguration": {
+    "dataBindingType": "NonTimeSeries",
+    "propertyBindings": [
+      {
+        "sourceColumnName": "site_id",
+        "targetPropertyId": "1001000000000101"
+      },
+      {
+        "sourceColumnName": "site_name",
+        "targetPropertyId": "1001000000000102"
+      },
+      {
+        "sourceColumnName": "water_body_type",
+        "targetPropertyId": "1001000000000103"
+      },
+      {
+        "sourceColumnName": "region",
+        "targetPropertyId": "1001000000000104"
+      },
+      {
+        "sourceColumnName": "country",
+        "targetPropertyId": "1001000000000105"
+      },
+      {
+        "sourceColumnName": "latitude",
+        "targetPropertyId": "1001000000000106"
+      },
+      {
+        "sourceColumnName": "longitude",
+        "targetPropertyId": "1001000000000107"
+      },
+      {
+        "sourceColumnName": "active",
+        "targetPropertyId": "1001000000000108"
+      },
+      {
+        "sourceColumnName": "established_year",
+        "targetPropertyId": "1001000000000109"
+      }
+    ],
+    "sourceTableProperties": {
+      "sourceType": "LakehouseTable",
+      "workspaceId": "${FABRIC_WORKSPACE_ID}",
+      "itemId": "${FABRIC_LAKEHOUSE_ID}",
+      "sourceTableName": "sites",
+      "sourceSchema": "dbo"
+    }
+  }
+}

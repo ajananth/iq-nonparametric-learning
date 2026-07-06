@@ -1,0 +1,78 @@
+{
+  "id": "1001000000000001",
+  "namespace": "usertypes",
+  "baseEntityTypeId": null,
+  "name": "Site",
+  "description": "A monitored water body (reservoir, wetland, coastal bay/lagoon, etc.).",
+  "entityIdParts": [
+    "1001000000000101"
+  ],
+  "displayNamePropertyId": "1001000000000102",
+  "namespaceType": "Custom",
+  "visibility": "Visible",
+  "properties": [
+    {
+      "id": "1001000000000101",
+      "name": "site_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1001000000000102",
+      "name": "site_name",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1001000000000103",
+      "name": "water_body_type",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1001000000000104",
+      "name": "region",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1001000000000105",
+      "name": "country",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1001000000000106",
+      "name": "latitude",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1001000000000107",
+      "name": "longitude",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "Double"
+    },
+    {
+      "id": "1001000000000108",
+      "name": "active",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1001000000000109",
+      "name": "established_year",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "BigInt"
+    }
+  ]
+}

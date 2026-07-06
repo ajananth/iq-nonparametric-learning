@@ -86,18 +86,22 @@ require a **manual graph refresh**. *(verified-capabilities.md §1a; risk G3/G4)
 
 ## 4. Local tooling
 
-**Status:** `Verified` (versions/extension confirmed) · Python runtime version **deferred to Phase 3/4**.
-**Source:** `docs/verified-capabilities.md` §3a.
+**Status:** `Verified` (versions/extension confirmed) · Python runtime **settled in Phase 3**.
+**Source:** `docs/verified-capabilities.md` §3a; Phase 3 (issue #20).
 
 - **Azure Developer CLI (`azd`) `1.21.3+`.**
 - **`azure.ai.agents` azd extension** — installed with `azd ext install azure.ai.agents` (equivalently
   `azd extension install azure.ai.agents`; auto-installs on first `azd ai agent ...` use).
 - **Azure CLI** — for `az login` (paired with `azd auth login`).
-- **A Python runtime** — the exact version is **deliberately deferred to Phase 3/4** (no runtime/language
-  commitment is made in Phase 2; see `scripts/README.md`).
+- **Python `3.10+`** (settled in Phase 3). The Phase 3/4 data + ontology scripts under `scripts/` depend on:
+  **pandas** (`>=2.0`), **pyarrow** (`>=14.0`), **deltalake** / delta-rs (`>=0.17`), **azure-identity**
+  (`>=1.15`), **requests** (`>=2.31`), **python-dotenv** (`>=1.0`) — pinned in
+  [`requirements.txt`](./requirements.txt) (`pip install -r requirements.txt`). Pins align with the
+  `ajananth/water-quality-assistant` data-seeder reference.
 - **git** and the **GitHub CLI (`gh`)** — for the Epic → Issue → PR workflow (Art. XIII).
 
-> Note: `azd`, Azure CLI, and Fabric/Foundry provisioning are **not** exercised in Phase 2.
+> Note: `azd`, Azure CLI, and Fabric/Foundry provisioning are **not** exercised in Phase 2 or Phase 3
+> (authoring only). The `scripts/` load + ontology deploy run in **Phase 4**.
 
 ---
 
@@ -141,6 +145,6 @@ require a **manual graph refresh**. *(verified-capabilities.md §1a; risk G3/G4)
 | 5 | RBAC: **Foundry User** + **Foundry Project Manager** (+ Fabric license) | `Verified-Preview` | §1c |
 | 6 | **Delegated user identity** with access to both workspace + project | `Verified-Preview` | §1c |
 | 7 | **BYO Entra app** + managed OAuth (SP scopes **Unverified**, #11) | `Unverified` (SP scopes) | §1c, Corrections #7 |
-| 8 | **azd 1.21.3+**, **`azure.ai.agents`** ext, **Azure CLI**, Python (version deferred) | `Verified` | §3a |
+| 8 | **azd 1.21.3+**, **`azure.ai.agents`** ext, **Azure CLI**, **Python 3.10+** (+ pandas/pyarrow/deltalake/azure-identity/requests/python-dotenv, see `requirements.txt`) | `Verified` | §3a |
 | 9 | Agent Optimizer **allow-list** (#10) — else **SkillOpt** fallback | `Gated` | §3, §4 |
 | 10 | Awareness: **Fabric IQ preview cost** | preview caveat | §2a |

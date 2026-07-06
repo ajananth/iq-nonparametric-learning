@@ -1,0 +1,63 @@
+{
+  "id": "4382a35d-88f6-4cb3-9bcd-117d85ef6184",
+  "dataBindingConfiguration": {
+    "dataBindingType": "NonTimeSeries",
+    "propertyBindings": [
+      {
+        "sourceColumnName": "measurement_id",
+        "targetPropertyId": "1003000000000101"
+      },
+      {
+        "sourceColumnName": "site_id",
+        "targetPropertyId": "1003000000000102"
+      },
+      {
+        "sourceColumnName": "recorded_at",
+        "targetPropertyId": "1003000000000103"
+      },
+      {
+        "sourceColumnName": "ph",
+        "targetPropertyId": "1003000000000104"
+      },
+      {
+        "sourceColumnName": "dissolved_oxygen_mgl",
+        "targetPropertyId": "1003000000000105"
+      },
+      {
+        "sourceColumnName": "turbidity_ntu",
+        "targetPropertyId": "1003000000000106"
+      },
+      {
+        "sourceColumnName": "chlorophyll_a_ugl",
+        "targetPropertyId": "1003000000000107"
+      },
+      {
+        "sourceColumnName": "nitrate_mgl",
+        "targetPropertyId": "1003000000000108"
+      },
+      {
+        "sourceColumnName": "phosphate_mgl",
+        "targetPropertyId": "1003000000000109"
+      },
+      {
+        "sourceColumnName": "algae_cell_count_cells_ml",
+        "targetPropertyId": "1003000000000110"
+      },
+      {
+        "sourceColumnName": "dominant_species_id",
+        "targetPropertyId": "1003000000000111"
+      },
+      {
+        "sourceColumnName": "notes",
+        "targetPropertyId": "1003000000000112"
+      }
+    ],
+    "sourceTableProperties": {
+      "sourceType": "LakehouseTable",
+      "workspaceId": "${FABRIC_WORKSPACE_ID}",
+      "itemId": "${FABRIC_LAKEHOUSE_ID}",
+      "sourceTableName": "water_quality_measurements",
+      "sourceSchema": "dbo"
+    }
+  }
+}

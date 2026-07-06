@@ -1,0 +1,71 @@
+{
+  "id": "1004000000000001",
+  "namespace": "usertypes",
+  "baseEntityTypeId": null,
+  "name": "TreatmentRecord",
+  "description": "A remediation/treatment action applied at a Site.",
+  "entityIdParts": [
+    "1004000000000101"
+  ],
+  "displayNamePropertyId": "1004000000000104",
+  "namespaceType": "Custom",
+  "visibility": "Visible",
+  "properties": [
+    {
+      "id": "1004000000000101",
+      "name": "treatment_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1004000000000102",
+      "name": "site_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1004000000000103",
+      "name": "treatment_date",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "DateTime"
+    },
+    {
+      "id": "1004000000000104",
+      "name": "method",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1004000000000105",
+      "name": "dosage_or_description",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1004000000000106",
+      "name": "outcome",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1004000000000107",
+      "name": "follow_up_required",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1004000000000108",
+      "name": "notes",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# Phase 3 authoring — Python 3.10+ dependencies for scripts/ (issue #20, EPIC C #3).
+# Pins align with the ajananth/water-quality-assistant data-seeder reference.
+# These libraries are exercised in Phase 4 (live load + ontology deploy), not Phase 3.
+pandas>=2.0
+pyarrow>=14.0
+deltalake>=0.17
+azure-identity>=1.15
+requests>=2.31
+python-dotenv>=1.0

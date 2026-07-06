@@ -6,3 +6,7 @@
 *.key
 *.pem
 secrets/
+
+# Python
+__pycache__/
+*.pyc

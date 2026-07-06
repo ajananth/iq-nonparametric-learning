@@ -1,0 +1,64 @@
+{
+  "id": "1002000000000001",
+  "namespace": "usertypes",
+  "baseEntityTypeId": null,
+  "name": "AlgaeSpecies",
+  "description": "An algae/cyanobacteria species with toxicity profile and bloom triggers.",
+  "entityIdParts": [
+    "1002000000000101"
+  ],
+  "displayNamePropertyId": "1002000000000102",
+  "namespaceType": "Custom",
+  "visibility": "Visible",
+  "properties": [
+    {
+      "id": "1002000000000101",
+      "name": "species_id",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1002000000000102",
+      "name": "scientific_name",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1002000000000103",
+      "name": "common_name",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1002000000000104",
+      "name": "phylum",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1002000000000105",
+      "name": "toxicity_level",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1002000000000106",
+      "name": "bloom_trigger_conditions",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    },
+    {
+      "id": "1002000000000107",
+      "name": "notes",
+      "redefines": null,
+      "baseTypeNamespaceType": null,
+      "valueType": "String"
+    }
+  ]
+}

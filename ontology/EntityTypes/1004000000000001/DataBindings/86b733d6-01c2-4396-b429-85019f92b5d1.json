@@ -1,0 +1,47 @@
+{
+  "id": "86b733d6-01c2-4396-b429-85019f92b5d1",
+  "dataBindingConfiguration": {
+    "dataBindingType": "NonTimeSeries",
+    "propertyBindings": [
+      {
+        "sourceColumnName": "treatment_id",
+        "targetPropertyId": "1004000000000101"
+      },
+      {
+        "sourceColumnName": "site_id",
+        "targetPropertyId": "1004000000000102"
+      },
+      {
+        "sourceColumnName": "treatment_date",
+        "targetPropertyId": "1004000000000103"
+      },
+      {
+        "sourceColumnName": "method",
+        "targetPropertyId": "1004000000000104"
+      },
+      {
+        "sourceColumnName": "dosage_or_description",
+        "targetPropertyId": "1004000000000105"
+      },
+      {
+        "sourceColumnName": "outcome",
+        "targetPropertyId": "1004000000000106"
+      },
+      {
+        "sourceColumnName": "follow_up_required",
+        "targetPropertyId": "1004000000000107"
+      },
+      {
+        "sourceColumnName": "notes",
+        "targetPropertyId": "1004000000000108"
+      }
+    ],
+    "sourceTableProperties": {
+      "sourceType": "LakehouseTable",
+      "workspaceId": "${FABRIC_WORKSPACE_ID}",
+      "itemId": "${FABRIC_LAKEHOUSE_ID}",
+      "sourceTableName": "treatment_records",
+      "sourceSchema": "dbo"
+    }
+  }
+}
