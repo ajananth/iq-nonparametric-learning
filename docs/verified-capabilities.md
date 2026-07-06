@@ -48,6 +48,10 @@ attributes), plus constraints/rules, and binds those definitions to real data.
 - **Querying**: a **Natural Language → Ontology (NL2Ontology)** layer converts business-term questions into
   structured queries, dispatching to the most efficient engine (**GQL** for Graph in Fabric, **KQL** for
   Eventhouse). The graph feature **requires Graph in Microsoft Fabric to be enabled at the tenant**.
+  > **Empirical divergence (Phase 4, #22, verified-by-test 2026-07-06):** no separate *"Graph in Microsoft
+  > Fabric"* tenant setting exists in this tenant (enumerated all 164 admin settings via the Fabric REST
+  > admin API). The **overview-tenant-settings** primary source (updated 2026-06-22) now lists **only**
+  > *"Enable Ontology item (preview)"* as the required setting. See §1d.
 - Supports our water-utilities model (Site / AlgaeSpecies / WaterQualityMeasurement / TreatmentRecord with
   hasMeasurement / hasTreatment / dominantSpecies relationships, bound from managed Lakehouse Delta tables)
   and satisfies **Art. IV** (schema + vocabulary live in the ontology, not in prompts).
@@ -96,12 +100,59 @@ There are **three documented, complementary paths**, and the flagship one is *na
 - **Tenant settings (Fabric admin):** **"Enable Ontology item (preview)"** is required; the **Graph** tenant
   setting is required for the graph feature; **Fabric data agent** / **operations agent** tenant settings are
   required only if consuming the ontology through those agents. *(overview-tenant-settings)*
+  > **Empirical update (Phase 4, #22, verified-by-test 2026-07-06):** in this tenant only **"Enable Ontology
+  > item (preview)"** was present/required — a distinct *"Graph in Microsoft Fabric"* setting was **not** found
+  > (see §1a note and §1d). The live NL2Ontology graph traversal succeeded with only the Ontology preview
+  > setting enabled.
 - **Gap / correction:** the source PDF's specific **`Item.Execute.All` / `Item.Read.All`** Entra app-registration
   scopes are **not corroborated** on these preview pages — documented access is delegated user identity + a BYO
   Entra app via managed OAuth, not a spelled-out service-principal scope set. **Fallback:** proceed with
   **delegated user identity** (as documented) for the demo; treat any service-principal scope list as
   **Unverified** and re-confirm against the BYO Entra-app registration flow / Fabric REST API docs before it
   enters the public article.
+
+---
+
+### 1d. LIVE deployment findings — Phase 4 (#22, EPIC C #3), verified-by-test **2026-07-06**
+
+A full live deploy was executed against workspace **`iq-npl`** (`a9dc85a5-fe8a-4ceb-9d5e-d93064c3f124`,
+F64 / F-SKU, Australia East). These are **empirical, verified-by-test** results — they refine the Phase 0
+doc-only claims above where live behaviour diverged. Reproducible via `scripts/` (see `docs/phase4-deployment.md`).
+
+- **Ontology item can be created via REST (no portal).** `POST /v1/workspaces/{ws}/items` with body
+  `{"displayName": "...", "type": "Ontology"}` creates an empty ontology item (returns `201` inline, or `202`
+  + LRO). Confirms the Item-Management "create without definition" claim for the `Ontology` type.
+  Tooling: `scripts/create_ontology_item.py`.
+- **Ontology definition deploys via `updateDefinition`.** Base64 parts (`definition.json`, `EntityTypes/…`,
+  `RelationshipTypes/…`, `DataBindings/…`, `Contextualizations/…`) POSTed to
+  `/items/{id}/updateDefinition` populate the 4 entity types + 3 relationship types + bindings. Both the
+  `/items/{id}/` and `/ontologies/{id}/` route variants return success.
+- **`updateDefinition` does NOT auto-build the companion GraphModel.** Creating/deploying an ontology item
+  auto-provisions a companion **GraphModel** item (`<ontology>_graph_<id>`) **and** a companion Lakehouse,
+  but the GraphModel's `graphType` / `graphDefinition` / `dataSources` stay **empty** after ontology
+  `updateDefinition`. Until the graph is built, `RefreshGraph` fails with
+  `GraphNotRefreshable — Graph doesn't have valid content` and NL2Ontology queries fail with
+  *"The natural language query could not be processed."* The Fabric **portal builds this graph on Save** in
+  the graph-model editor. **This step can be performed programmatically** (no portal) by projecting the
+  ontology into a GraphModel definition and applying it via the GraphModel item's own `updateDefinition`,
+  then triggering `RefreshGraph`. Tooling: **`scripts/build_graph_model.py`**.
+- **`RefreshGraph` is a valid programmatic job type.** `POST /items/{graphId}/jobs/instances?jobType=RefreshGraph`
+  returns `202` and, once the graph has valid content, completes and ingests the bound Delta data. This also
+  satisfies the §1a "manual graph refresh" requirement for picking up upstream row changes — **no portal
+  needed**.
+- **Graph property `type` tokens (verified against live built graphs):** `STRING`, `INT`, `FLOAT`, `BOOLEAN`.
+  No `DATETIME`/`TIMESTAMP` token was observed; ontology `DateTime` properties are represented as `STRING`
+  (ISO text) in the GraphModel. Ontology→graph type map used: `String→STRING`, `Double→FLOAT`,
+  `BigInt→INT`, `Boolean→BOOLEAN`, `DateTime→STRING`.
+- **Data-source path shape:** GraphModel `dataSources[].properties.path` uses
+  `abfss://{workspaceId}@onelake.pbidedicated.windows.net/{lakehouseId}/Tables/[{schema}/]{table}` (host is
+  `onelake.pbidedicated.windows.net`, **not** `…dfs…`). For a **non-schema** Lakehouse (how
+  `scripts/load_lakehouse.py` writes managed tables), the path has **no `dbo/` segment**; a schema-enabled
+  Lakehouse uses `Tables/dbo/{table}`. Pointing at the wrong shape yields `DataSourceSchemaFetchFailed`.
+- **End-to-end NL2Ontology traversal works live** once the graph is built + refreshed — see the recorded
+  query + result in `docs/phase4-deployment.md`. This exercises
+  `Site→hasMeasurement→WaterQualityMeasurement→dominantSpecies→AlgaeSpecies` and `Site→hasTreatment→TreatmentRecord`
+  in a single natural-language question, confirming the managed-Delta binding + graph path end to end.
 
 ---
 

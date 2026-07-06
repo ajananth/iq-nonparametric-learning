@@ -43,7 +43,7 @@ _TABLES = [
     ("treatment_records", "treatment_records.csv"),
 ]
 
-_DEFAULT_LAKEHOUSE_NAME = "WaterIQ_Lakehouse"
+_DEFAULT_LAKEHOUSE_NAME = "iqnpl_lakehouse"
 
 
 def create_lakehouse(workspace_id: str, token: str, display_name: str) -> str:
