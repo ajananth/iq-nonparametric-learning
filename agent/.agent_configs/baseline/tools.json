@@ -1,11 +1,11 @@
 {
-  "_comment": "PLACEHOLDER baseline tool config. Tool-optimization target (docs/verified-capabilities.md §3b): the optimizer refines DESCRIPTIONS only, never type/required/defaults. The fabric_iq_preview tool is the verified Foundry tool type (§2a); server_url is a Fabric IQ MCP ontology endpoint. Real project_connection_id / server_url values come from config/env (.env), never committed (Art. VI). Phase 5 finalises wiring.",
+  "_comment": "Phase 5 (issue #24, EPIC D #4) baseline tool config. VERIFIED shape: fabric_iq_preview is the Foundry server-side tool (docs/verified-capabilities.md §2a; Learn foundry/agents/how-to/tools/fabric-iq, updated 2026-07-03). project_connection_id (REQUIRED) is the id of the Fabric IQ (OneLake Catalog) project connection created in the Foundry portal; server_url is the Ontology MCP endpoint for the live iqnpl_ontology. BOTH come from config/env (.env) — never committed (Art. VI: infra GUIDs are OK, but the connection id is resolved at runtime from FABRIC_IQ_PROJECT_CONNECTION_ID). Tool-optimization target (§3b): the optimizer may refine the DESCRIPTION only, never type/required/defaults. Per Art. IV the description names business concepts, not tables/columns/SQL.",
   "tools": [
     {
       "type": "fabric_iq_preview",
-      "server_label": "fabric_iq_ontology",
-      "description": "Query the Fabric IQ ontology (preview) for the water-utility domain. Ask in business terms about entities (WaterSource, WaterTreatmentPlant, AlgalMonitoringStation, WaterQualityMetric), their properties, and relationships (monitors, supplies, records). Returns ontology-grounded answers routed via NL2Ontology over bound OneLake sources, in the signed-in user's context.",
-      "project_connection_id": "${FOUNDRY_PROJECT_CONNECTION_ID}",
+      "server_label": "fabriciq-iqnpl-ontology",
+      "description": "Answer questions about the water-quality / algal-bloom domain by querying the Fabric IQ ontology (preview). Ask in business terms about monitored water sites and their attributes (location, region, water-body type, whether active); water-quality measurements taken at those sites (readings such as pH, dissolved oxygen, turbidity, chlorophyll-a, nutrients, and algal cell counts); the algae species observed (scientific and common name, taxonomic group, toxicity level, bloom triggers); and the remediation treatments applied at sites (method, outcome, follow-up). You can also ask how these relate: which measurements and treatments belong to a site, and which algae species is dominant in a measurement. Fabric IQ resolves the question via NL2Ontology over the bound OneLake data and returns a grounded answer in the signed-in user's context. Use it for every data-backed claim; do not invent table or column names.",
+      "project_connection_id": "${FABRIC_IQ_PROJECT_CONNECTION_ID}",
       "server_url": "https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/${FABRIC_WORKSPACE_ID}/items/${FABRIC_ONTOLOGY_ITEM_ID}/ontologyEndpoint",
       "require_approval": "never"
     }

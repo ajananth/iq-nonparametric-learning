@@ -1,0 +1,12 @@
+{
+  "_comment": "PRICING INPUT — NOT a verified Microsoft price claim (Constitution Art. I). These per-million-token USD rates are operator-supplied placeholders so the scorer can compute $/task and cost-per-correct-answer transparently. Update with your negotiated/portal rates before quoting absolute dollars. The H1 conclusion relies on the tokens/cost RATIO between models, which is robust to the absolute rate as long as both models are priced on the same basis. Rates are per 1,000,000 tokens.",
+  "currency": "USD",
+  "unit": "per_million_tokens",
+  "verified": false,
+  "source": "placeholder - replace with your Foundry/AOAI pricing",
+  "models": {
+    "gpt-5.4": {"input": 1.25, "output": 10.0},
+    "gpt-5.4-mini": {"input": 0.25, "output": 2.0}
+  },
+  "default": {"input": 1.0, "output": 5.0}
+}
