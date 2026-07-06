@@ -48,9 +48,9 @@ attributes), plus constraints/rules, and binds those definitions to real data.
 - **Querying**: a **Natural Language → Ontology (NL2Ontology)** layer converts business-term questions into
   structured queries, dispatching to the most efficient engine (**GQL** for Graph in Fabric, **KQL** for
   Eventhouse). The graph feature **requires Graph in Microsoft Fabric to be enabled at the tenant**.
-- Supports our water-utilities model (WaterSource/Plant/MonitoringStation/Metric with monitors/supplies/records
-  relationships, telemetry bound from an Eventhouse) and satisfies **Art. IV** (schema + vocabulary live in the
-  ontology, not in prompts).
+- Supports our water-utilities model (Site / AlgaeSpecies / WaterQualityMeasurement / TreatmentRecord with
+  hasMeasurement / hasTreatment / dominantSpecies relationships, bound from managed Lakehouse Delta tables)
+  and satisfies **Art. IV** (schema + vocabulary live in the ontology, not in prompts).
 
 ### 1b. How the ontology is exposed to an agent — **RESOLVED (the key open question)**
 The plan's open question ("MCP endpoint **vs** native Foundry connector") rested on a **false dichotomy**.

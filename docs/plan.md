@@ -11,7 +11,8 @@ prompts, tools, and skills) to:
 3. Demonstrate the **Fabric IQ ↔ Foundry semantic contract** (the other headline value).
 
 **Domain scenario:** Water utilities — monitoring & responding to **algal blooms** (cyanobacteria,
-MIB/Geosmin taste-and-odor compounds, cyanotoxins) across sensor/telemetry, lab, and asset data.
+MIB/Geosmin taste-and-odor compounds, cyanotoxins) across four related **Lakehouse tables**: monitored
+**Sites**, an **AlgaeSpecies** catalogue, time-series **WaterQualityMeasurements**, and **TreatmentRecords**.
 
 ## Ways of working (governed by the Constitution)
 - All work lives in a **dedicated workspace/session**: `iq-nonparametric-learning`
@@ -131,15 +132,18 @@ while the optimizer allow-list request (#10) and Azure/Fabric provisioning happe
   eval/ (eval.yaml + datasets), data/ (synthetic fixtures + real-data slot), scripts/.
 
 ### Phase 3 — Domain & data model (water utility / algal bloom)
-- Define ontology: entities (WaterSource, WaterTreatmentPlant, AlgalMonitoringStation,
-  WaterQualityMetric), relationships (monitors / supplies / records), properties (Phycocyanin,
-  Chlorophyll-a, Geosmin, MIB, cell count, PAC dosing rate, storage, capacity).
-- Produce synthetic fixtures (telemetry stream, lab assays, asset/geospatial) + schema for wiring
-  real data.
+- Define ontology (over the real synthetic dataset; CSV headers authoritative): entities **Site**,
+  **AlgaeSpecies**, **WaterQualityMeasurement**, **TreatmentRecord** (properties = real CSV columns,
+  key = each `*_id`); relationships **hasMeasurement** (Site→WaterQualityMeasurement, `site_id`),
+  **hasTreatment** (Site→TreatmentRecord, `site_id`), **dominantSpecies**
+  (WaterQualityMeasurement→AlgaeSpecies, `dominant_species_id`).
+- Vendor 4 synthetic CSVs; author ontology (updateDefinition parts) + scripts + docs. **Authoring only**
+  — no live Fabric (that is Phase 4).
 
 ### Phase 4 — Fabric IQ ontology build
-- Steps to create OneLake sources (Eventhouse telemetry, Lakehouse lab reports, asset tables),
-  build the Ontology item, bindings, and validate NL2Ontology queries.
+- **Flat** load (no medallion) of the 4 CSVs into 4 **managed** Lakehouse Delta tables
+  (`scripts/load_lakehouse.py`), then deploy the ontology definition + bindings via **updateDefinition**
+  (`scripts/deploy_ontology.py`), and validate NL2Ontology queries.
 
 ### Phase 5 — Foundry agent harness
 - Entra app registration + permissions.
