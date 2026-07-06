@@ -1,0 +1,13 @@
+{
+  "namespace": "usertypes",
+  "id": "2001000000000001",
+  "name": "hasMeasurement",
+  "description": "Site produced a WaterQualityMeasurement (bound via water_quality_measurements.site_id).",
+  "namespaceType": "Custom",
+  "source": {
+    "entityTypeId": "1001000000000001"
+  },
+  "target": {
+    "entityTypeId": "1003000000000001"
+  }
+}

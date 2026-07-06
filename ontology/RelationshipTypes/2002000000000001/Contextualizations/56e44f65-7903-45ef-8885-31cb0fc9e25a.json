@@ -1,0 +1,22 @@
+{
+  "id": "56e44f65-7903-45ef-8885-31cb0fc9e25a",
+  "dataBindingTable": {
+    "workspaceId": "${FABRIC_WORKSPACE_ID}",
+    "itemId": "${FABRIC_LAKEHOUSE_ID}",
+    "sourceTableName": "treatment_records",
+    "sourceSchema": "dbo",
+    "sourceType": "LakehouseTable"
+  },
+  "sourceKeyRefBindings": [
+    {
+      "sourceColumnName": "site_id",
+      "targetPropertyId": "1001000000000101"
+    }
+  ],
+  "targetKeyRefBindings": [
+    {
+      "sourceColumnName": "treatment_id",
+      "targetPropertyId": "1004000000000101"
+    }
+  ]
+}

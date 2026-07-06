@@ -1,0 +1,13 @@
+{
+  "namespace": "usertypes",
+  "id": "2002000000000001",
+  "name": "hasTreatment",
+  "description": "Site received a TreatmentRecord (bound via treatment_records.site_id).",
+  "namespaceType": "Custom",
+  "source": {
+    "entityTypeId": "1001000000000001"
+  },
+  "target": {
+    "entityTypeId": "1004000000000001"
+  }
+}

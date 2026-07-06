@@ -1,0 +1,22 @@
+site_id,site_name,water_body_type,region,country,latitude,longitude,active,established_year
+e2a66259-a7bb-52d9-9aaa-33350adee837,Blue Lake Reservoir,reservoir,Southeast Queensland,Australia,-27.4105,152.602,true,2015
+772a0b2b-7df0-558a-9e21-d4f42aaaff10,Ironbark Wetland,wetland,Southeast Queensland,Australia,-27.583,152.741,true,2018
+e967cd58-d230-511a-8d81-255fab5748a9,Moreton Bay North,coastal_bay_lagoon,Southeast Queensland,Australia,-27.031,153.087,true,2016
+351b1a48-d61e-5e1b-8864-74e494879dc9,Upper Bremer River,river,Southeast Queensland,Australia,-27.822,152.411,true,2017
+86ad11ee-e67c-5f6f-afff-13708776a73c,Darling River at Bourke,river,Murray-Darling Basin,Australia,-30.088,145.936,true,2015
+5a50eb3d-6685-51a0-8ed5-93d22c90f50d,Lake Menindee North,lake,Murray-Darling Basin,Australia,-32.379,142.412,true,2014
+5ed1bbc9-c108-56e0-91b0-3b8effae2539,Wentworth Estuary Reach,estuary,Murray-Darling Basin,Australia,-34.112,141.915,true,2019
+eca073c0-5e52-579f-bcec-8c21817761a0,Peel-Harvey Estuary South,estuary,Southwest Western Australia,Australia,-32.634,115.713,true,2013
+a8948238-32f6-5d28-bf54-0805f1c4affa,Gnangara Lake Reserve,lake,Southwest Western Australia,Australia,-31.702,115.876,true,2016
+b2f34044-e3f5-594a-92f1-c7f14516de86,Sugarloaf Reservoir Mid,reservoir,Victoria,Australia,-37.672,145.325,true,2012
+e10104b9-374c-53ba-b755-997b9f7a62c5,Western Treatment Wetland,wetland,Victoria,Australia,-37.954,144.513,true,2017
+a9c590d5-ecfb-5d7b-b134-ebbae6ac853c,Warragamba Dam Forebay,drinking_water_catchment,New South Wales,Australia,-33.879,150.573,true,2010
+dd6bde54-fca1-5c41-913c-cb3783e6199c,Lake Macquarie South Basin,lake,New South Wales,Australia,-33.1,151.588,true,2018
+bcc87cef-0c77-5c30-a67c-77e013a3936e,Lake Rotorua Central,lake,Bay of Plenty,New Zealand,-38.084,176.267,true,2015
+ab224cb4-5f16-5681-bee5-02bc215256d6,Rotorua Drinking Catchment,drinking_water_catchment,Bay of Plenty,New Zealand,-38.134,176.32,true,2016
+a113884d-c740-5822-aff6-d6cd26c56d78,Lake Champlain South Bay,lake,Vermont,USA,44.5126,-73.2831,true,2014
+531f37c3-084e-55b3-bc9b-0db5281b54d8,Sacramento River at Redding,river,California,USA,40.5865,-122.3917,true,2017
+b2d06226-66a9-50c0-a5ba-58ae32da68f7,Chesapeake Bay Eastern,estuary,Maryland,USA,38.976,-76.496,true,2015
+aba731cc-dbfa-53d8-b97d-8a5745c8ba9a,Florida Coastal Lagoon,coastal_bay_lagoon,Florida,USA,28.478,-80.797,true,2019
+28fc10d6-50dd-5ec3-87d9-0f145db4d4d5,Lake Garda North Shore,lake,Lombardy,Italy,45.883,10.729,true,2013
+

@@ -1,0 +1,43 @@
+{
+  "id": "7fd3a1bf-9a40-46ae-b4ee-1a3f0685c86b",
+  "dataBindingConfiguration": {
+    "dataBindingType": "NonTimeSeries",
+    "propertyBindings": [
+      {
+        "sourceColumnName": "species_id",
+        "targetPropertyId": "1002000000000101"
+      },
+      {
+        "sourceColumnName": "scientific_name",
+        "targetPropertyId": "1002000000000102"
+      },
+      {
+        "sourceColumnName": "common_name",
+        "targetPropertyId": "1002000000000103"
+      },
+      {
+        "sourceColumnName": "phylum",
+        "targetPropertyId": "1002000000000104"
+      },
+      {
+        "sourceColumnName": "toxicity_level",
+        "targetPropertyId": "1002000000000105"
+      },
+      {
+        "sourceColumnName": "bloom_trigger_conditions",
+        "targetPropertyId": "1002000000000106"
+      },
+      {
+        "sourceColumnName": "notes",
+        "targetPropertyId": "1002000000000107"
+      }
+    ],
+    "sourceTableProperties": {
+      "sourceType": "LakehouseTable",
+      "workspaceId": "${FABRIC_WORKSPACE_ID}",
+      "itemId": "${FABRIC_LAKEHOUSE_ID}",
+      "sourceTableName": "algae_species",
+      "sourceSchema": "dbo"
+    }
+  }
+}
