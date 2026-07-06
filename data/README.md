@@ -23,8 +23,8 @@ data**, so everything here is **fabricated, non-sensitive, and intentionally com
 ## The 4 tables (real schema — CSV headers are authoritative, Constitution Art. I)
 
 Each CSV loads **flat** (no medallion, no transforms) into one **managed Delta table** of the same stem name
-in a Fabric Lakehouse (see `scripts/load_lakehouse.py`). The ontology (`ontology/`) binds these tables to
-entity types and relationships.
+in a Fabric Lakehouse (default display name **`iqnpl_lakehouse`**, created by `scripts/load_lakehouse.py`). The
+ontology (`ontology/`) binds these tables to entity types and relationships.
 
 ### `sites.csv` → table `sites` (20 rows) — entity **Site**
 | Column | Type | Notes |
