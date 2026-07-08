@@ -114,6 +114,42 @@ matrix. This is the auditable proof of Art. II/III compliance.
 Each answerable question carries a committed SQL query and a regenerated expected answer; negatives carry an
 `answer_type: refusal`. The set is fixed for the whole experiment.
 
+### 4.1 Optimization train/test split (Phase 6, issue #29)
+
+Phase 6 tunes the frozen-weights **text surface** (agent/KB instructions, KB `retrievalReasoningEffort`,
+row-injection format) with a SkillOpt-style loop. To keep `eval/dataset.jsonl` a **pure held-out test**, the
+loop never sees it. Instead it optimizes against a **disjoint** trainset, `eval/optimization_trainset.jsonl`
+(18 questions — 6 single-hop, 8 multi-hop, 4 negative — split TRAIN 12 / DEV 6), authored over the **same
+committed data** (20 sites / 50 algae_species / 200 water_quality_measurements / 80 treatment_records; no rows
+added or mutated) with a sibling SQL oracle (`eval/trainset_ground_truth.py`, which reuses `ground_truth.py`
+and asserts both the row counts and question-text disjointness from the 24-Q eval). The loop rolls out on
+TRAIN, validates candidate edits on the held-out DEV split, and adopts only strictly-better configs; the 24-Q
+`dataset.jsonl` / `ground_truth.py` / `ground_truth.json` / `scorer.py` stay byte-identical so the optimized
+scorecard is scored on the same instrument as the baseline. The grounding **mechanism** (KB retrieve + inject,
+`rerankerThreshold: 0`, dual-auth) is held constant baseline→optimized, so the measured lift is single-variable
+(text only). Weights are never trained (`fine_tuning: false`; deployment unchanged).
+
+### 4.2 Phase-6 findings (issue #29) — two results
+
+Full detail: `eval/optimization_runs/20260708T064838Z/RESULTS.md`. Summary of what the loop taught us:
+
+- **Finding A (cautionary — small-DEV overfitting).** The loop's DEV winner `c06` (KB `reasoning=low`
+  + multi-hop retrieval instruction + injection `max_row_chars=600`) scored **100% on the 6-Q DEV** but
+  **REGRESSED to 83.3% (20/24) on the 24-Q held-out** (−8.4 pts; S05 + M10 flipped) while cutting tokens
+  −59%. With a tiny DEV split, aggressive edits that win DEV can lose the held-out test. `c06` was **not
+  adopted.**
+- **Finding B (adopted — mechanism-justified, accuracy-safe token trim).** Decomposing `c06` and keeping
+  only the edit that is accuracy-safe *by construction* — a client-side injection change that drops 8
+  redundant `*_json` graph-serialization columns (they duplicate the flat structured columns the SQL ground
+  truth is computed over; the synthesized-answer safety net is retained) — held **held-out accuracy at
+  91.7% (22/24)** (zero flips, negatives 6/6) with tokens lower (single-run total −5.6%; **−42%** when the
+  trim is isolated on identical rows, since live retrieval volume varies run-to-run). The knowledge base is
+  left **byte-identical** to the Phase-5 baseline (reasoning=medium; no re-provision), so retrieval is
+  single-variable. This is the Phase-6 **recommended** config (`agent/.agent_configs/optimized/`).
+
+The recommended change is purely client-side text (`injection.json`); deployment, weights, KB, eval set,
+scorer, and ground truth are all unchanged (`fine_tuning: false`).
+
 ---
 
 ## 5. Success criteria (pre-registered)

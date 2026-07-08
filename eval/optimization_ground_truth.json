@@ -1,0 +1,276 @@
+{
+  "_meta": {
+    "data_fingerprint_sha256": "c5dadc5dd5584276404b9b8cf8d7a5a2ded209759c5532752c498d1f651cd7f3",
+    "disjoint_from": "eval/dataset.jsonl (verified: no shared question text)",
+    "n_questions": 18,
+    "note": "TRAIN/DEV split for the Phase-6 optimizer; the 24-Q eval stays the pure held-out test.",
+    "source": "eval/optimization_trainset.jsonl over data/*.csv via DuckDB (same oracle as ground_truth.py)",
+    "split_counts": {
+      "dev": 6,
+      "train": 12
+    }
+  },
+  "ground_truth": {
+    "T-M01": {
+      "answer_type": "set",
+      "category": "multi_hop",
+      "count": 5,
+      "expected_traversal": [
+        "Site",
+        "hasMeasurement",
+        "WaterQualityMeasurement"
+      ],
+      "question": "Which five sites have the highest single turbidity measurement recorded?",
+      "split": "train",
+      "sql": "SELECT s.site_name FROM water_quality_measurements m JOIN sites s ON m.site_id = s.site_id ORDER BY m.turbidity_ntu DESC LIMIT 5",
+      "values": [
+        "Chesapeake Bay Eastern",
+        "Moreton Bay North",
+        "Peel-Harvey Estuary South",
+        "Peel-Harvey Estuary South",
+        "Wentworth Estuary Reach"
+      ]
+    },
+    "T-M02": {
+      "answer_type": "set",
+      "category": "multi_hop",
+      "count": 3,
+      "expected_traversal": [
+        "Site",
+        "hasMeasurement",
+        "WaterQualityMeasurement",
+        "dominantSpecies",
+        "AlgaeSpecies"
+      ],
+      "question": "Which monitored sites have recorded a measurement whose dominant algae species belongs to the phylum Dinoflagellata?",
+      "split": "train",
+      "sql": "SELECT DISTINCT s.site_name FROM water_quality_measurements m JOIN sites s ON m.site_id = s.site_id JOIN algae_species a ON m.dominant_species_id = a.species_id WHERE a.phylum = 'Dinoflagellata' ORDER BY s.site_name",
+      "values": [
+        "Florida Coastal Lagoon",
+        "Moreton Bay North",
+        "Peel-Harvey Estuary South"
+      ]
+    },
+    "T-M03": {
+      "answer_type": "set",
+      "category": "multi_hop",
+      "count": 4,
+      "expected_traversal": [
+        "Site",
+        "hasTreatment",
+        "TreatmentRecord"
+      ],
+      "question": "Which treatment methods have been applied at Lake Rotorua Central?",
+      "split": "train",
+      "sql": "SELECT DISTINCT t.method FROM treatment_records t JOIN sites s ON t.site_id = s.site_id WHERE s.site_name = 'Lake Rotorua Central' ORDER BY t.method",
+      "values": [
+        "algaecide application (copper sulfate)",
+        "barley straw application",
+        "clay flocculation",
+        "mechanical aeration"
+      ]
+    },
+    "T-M04": {
+      "answer_type": "set",
+      "category": "multi_hop",
+      "count": 7,
+      "expected_traversal": [
+        "Site",
+        "hasMeasurement",
+        "WaterQualityMeasurement",
+        "dominantSpecies",
+        "AlgaeSpecies"
+      ],
+      "question": "Which algae species appear as the dominant species in measurements taken at estuary sites?",
+      "split": "train",
+      "sql": "SELECT DISTINCT a.scientific_name FROM water_quality_measurements m JOIN sites s ON m.site_id = s.site_id JOIN algae_species a ON m.dominant_species_id = a.species_id WHERE s.water_body_type = 'estuary' ORDER BY a.scientific_name",
+      "values": [
+        "Alexandrium minutum",
+        "Anabaena flos-aquae",
+        "Aphanizomenon flos-aquae",
+        "Heterosigma akashiwo",
+        "Microcystis aeruginosa",
+        "Nodularia spumigena",
+        "Prymnesium parvum"
+      ]
+    },
+    "T-M05": {
+      "answer_type": "scalar",
+      "category": "multi_hop",
+      "expected_traversal": [
+        "Site",
+        "hasMeasurement",
+        "WaterQualityMeasurement"
+      ],
+      "question": "How many water-quality measurements were taken at Sacramento River at Redding?",
+      "split": "train",
+      "sql": "SELECT COUNT(*) AS n FROM water_quality_measurements m JOIN sites s ON m.site_id = s.site_id WHERE s.site_name = 'Sacramento River at Redding'",
+      "value": 10
+    },
+    "T-M06": {
+      "answer_type": "set",
+      "category": "multi_hop",
+      "count": 6,
+      "expected_traversal": [
+        "Site",
+        "hasTreatment",
+        "TreatmentRecord"
+      ],
+      "question": "For sites located in the USA, which treatment methods have been applied?",
+      "split": "dev",
+      "sql": "SELECT DISTINCT t.method FROM treatment_records t JOIN sites s ON t.site_id = s.site_id WHERE s.country = 'USA' ORDER BY t.method",
+      "values": [
+        "algaecide application (copper sulfate)",
+        "barley straw application",
+        "clay flocculation",
+        "manual removal (skimming)",
+        "mechanical aeration",
+        "nutrient reduction"
+      ]
+    },
+    "T-M07": {
+      "answer_type": "scalar",
+      "category": "multi_hop",
+      "expected_traversal": [
+        "WaterQualityMeasurement",
+        "dominantSpecies",
+        "AlgaeSpecies"
+      ],
+      "question": "What is the average chlorophyll-a (ug/L) for measurements whose dominant species is Anabaena flos-aquae, to two decimals?",
+      "split": "dev",
+      "sql": "SELECT ROUND(AVG(m.chlorophyll_a_ugl), 2) AS avg_chl FROM water_quality_measurements m JOIN algae_species a ON m.dominant_species_id = a.species_id WHERE a.scientific_name = 'Anabaena flos-aquae'",
+      "value": 132.1
+    },
+    "T-M08": {
+      "answer_type": "set",
+      "category": "multi_hop",
+      "count": 6,
+      "expected_traversal": [
+        "Site",
+        "hasMeasurement",
+        "WaterQualityMeasurement",
+        "dominantSpecies",
+        "AlgaeSpecies"
+      ],
+      "question": "Which sites have recorded a measurement whose dominant species has moderate toxicity?",
+      "split": "dev",
+      "sql": "SELECT DISTINCT s.site_name FROM water_quality_measurements m JOIN sites s ON m.site_id = s.site_id JOIN algae_species a ON m.dominant_species_id = a.species_id WHERE a.toxicity_level = 'moderate' ORDER BY s.site_name",
+      "values": [
+        "Chesapeake Bay Eastern",
+        "Gnangara Lake Reserve",
+        "Peel-Harvey Estuary South",
+        "Upper Bremer River",
+        "Warragamba Dam Forebay",
+        "Wentworth Estuary Reach"
+      ]
+    },
+    "T-N01": {
+      "answer_type": "refusal",
+      "answerable": false,
+      "category": "negative",
+      "expected_traversal": [],
+      "question": "What is the electrical conductivity recorded at each monitored site?",
+      "split": "train",
+      "sql": null
+    },
+    "T-N02": {
+      "answer_type": "refusal",
+      "answerable": false,
+      "category": "negative",
+      "expected_traversal": [],
+      "question": "Which laboratory analyzed each water sample?",
+      "split": "train",
+      "sql": null
+    },
+    "T-N03": {
+      "answer_type": "refusal",
+      "answerable": false,
+      "category": "negative",
+      "expected_traversal": [],
+      "question": "What is the population of the nearest town to each monitored site?",
+      "split": "train",
+      "sql": null
+    },
+    "T-N04": {
+      "answer_type": "refusal",
+      "answerable": false,
+      "category": "negative",
+      "expected_traversal": [],
+      "question": "What dissolved oxygen level was recorded at 'Lake Imaginary Springs'?",
+      "split": "dev",
+      "sql": null
+    },
+    "T-S01": {
+      "answer_type": "scalar",
+      "category": "single_hop",
+      "expected_traversal": [
+        "Site"
+      ],
+      "question": "How many monitored sites are lakes?",
+      "split": "train",
+      "sql": "SELECT COUNT(*) AS n FROM sites WHERE water_body_type = 'lake'",
+      "value": 6
+    },
+    "T-S02": {
+      "answer_type": "scalar",
+      "category": "single_hop",
+      "expected_traversal": [
+        "Site"
+      ],
+      "question": "How many monitored sites are located in Australia?",
+      "split": "train",
+      "sql": "SELECT COUNT(*) AS n FROM sites WHERE country = 'Australia'",
+      "value": 13
+    },
+    "T-S03": {
+      "answer_type": "set",
+      "category": "single_hop",
+      "count": 4,
+      "expected_traversal": [
+        "AlgaeSpecies"
+      ],
+      "question": "What distinct toxicity levels are recorded for algae species?",
+      "split": "train",
+      "sql": "SELECT DISTINCT toxicity_level FROM algae_species ORDER BY toxicity_level",
+      "values": [
+        "high",
+        "low",
+        "moderate",
+        "none"
+      ]
+    },
+    "T-S04": {
+      "answer_type": "scalar",
+      "category": "single_hop",
+      "expected_traversal": [
+        "AlgaeSpecies"
+      ],
+      "question": "How many algae species belong to the phylum Bacillariophyta?",
+      "split": "train",
+      "sql": "SELECT COUNT(*) AS n FROM algae_species WHERE phylum = 'Bacillariophyta'",
+      "value": 10
+    },
+    "T-S05": {
+      "answer_type": "scalar",
+      "category": "single_hop",
+      "expected_traversal": [
+        "WaterQualityMeasurement"
+      ],
+      "question": "What is the average dissolved oxygen concentration (mg/L) across all water-quality measurements, to two decimals?",
+      "split": "dev",
+      "sql": "SELECT ROUND(AVG(dissolved_oxygen_mgl), 2) AS avg_do FROM water_quality_measurements",
+      "value": 9.35
+    },
+    "T-S06": {
+      "answer_type": "scalar",
+      "category": "single_hop",
+      "expected_traversal": [
+        "WaterQualityMeasurement"
+      ],
+      "question": "What is the highest nitrate reading recorded, in mg/L?",
+      "split": "dev",
+      "sql": "SELECT ROUND(MAX(nitrate_mgl), 2) AS max_nitrate FROM water_quality_measurements",
+      "value": 1.99
+    }
+  }
+}

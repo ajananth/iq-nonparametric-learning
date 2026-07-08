@@ -1,0 +1,6 @@
+{
+  "reasoning": "medium",
+  "retrieval_instructions": null,
+  "answer_instructions": null,
+  "_note": "Phase-6 RECOMMENDED config keeps the knowledge base BYTE-IDENTICAL to the Phase-5 baseline (reasoning=medium, no custom retrieval/answer instructions). The only Phase-6 change is CLIENT-SIDE injection (see injection.json: drop 8 redundant *_json graph-serialization columns). Therefore retrieval is single-variable vs baseline and NO KB re-provision is required. The rejected c06 full-loop winner (reasoning=low + multi-hop retrieval instruction + max_row_chars=600) is documented in ../../../eval/optimization_runs/ as the overfitting cautionary finding."
+}

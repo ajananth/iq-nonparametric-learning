@@ -1,0 +1,350 @@
+{
+  "config": {
+    "model": "gpt-5.4",
+    "reflect_model": "gpt-5.4",
+    "judge_model": "gpt-5.4",
+    "seed": 1234,
+    "max_steps": 10,
+    "mock": false,
+    "train_n": 12,
+    "dev_n": 6,
+    "objective": "lexicographic(accuracy desc, tokens asc); DEV strict-better gate; neg guardrail"
+  },
+  "candidates": [
+    {
+      "cid": "seed",
+      "target": "seed",
+      "parent": null,
+      "rationale": "Phase-5 baseline config.",
+      "train": {
+        "n": 12,
+        "correct": 11,
+        "accuracy_pct": 91.67,
+        "tokens": 64589,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "dev": {
+        "n": 6,
+        "correct": 6,
+        "accuracy_pct": 100.0,
+        "tokens": 11462,
+        "neg_n": 1,
+        "neg_correct": 1
+      },
+      "dev_objective": [
+        100.0,
+        -11462
+      ],
+      "promising": true,
+      "adopted": true
+    },
+    {
+      "cid": "c01",
+      "target": "injection",
+      "parent": "seed",
+      "rationale": "The current setting injects a synthesized answer alongside raw rows. That extra text can bias the model toward an incorrect 'no rows' conclusion and adds many tokens. Disabling it makes the agent rely directly on the verbatim ontology rows, which should improve multi-hop recall when relevant rows are present, while also reducing token usage without increasing fabrication risk because the base instructions already require refusal when evidence is absent.",
+      "edit": {
+        "target": "injection",
+        "rationale": "The current setting injects a synthesized answer alongside raw rows. That extra text can bias the model toward an incorrect 'no rows' conclusion and adds many tokens. Disabling it makes the agent rely directly on the verbatim ontology rows, which should improve multi-hop recall when relevant rows are present, while also reducing token usage without increasing fabrication risk because the base instructions already require refusal when evidence is absent.",
+        "injection": {
+          "include_synthesized_answer": false,
+          "max_rows": null,
+          "drop_columns": [],
+          "max_row_chars": null
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 12,
+        "accuracy_pct": 100.0,
+        "tokens": 145786,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": true,
+      "dev": {
+        "n": 6,
+        "correct": 5,
+        "accuracy_pct": 83.33,
+        "tokens": 14431,
+        "neg_n": 1,
+        "neg_correct": 1
+      },
+      "dev_objective": [
+        83.33,
+        -14431
+      ],
+      "adopted": false
+    },
+    {
+      "cid": "c02",
+      "target": "injection",
+      "parent": "seed",
+      "rationale": "Remove the synthesized answer so the model relies only on verbatim ontology rows. This directly addresses the observed failure mode where the injected synthesis asserted 'NO ROWS' and overrode available evidence, while also reducing token usage on the most expensive questions. Keeping all raw rows preserves safe refusals when evidence is truly absent.",
+      "edit": {
+        "target": "injection",
+        "rationale": "Remove the synthesized answer so the model relies only on verbatim ontology rows. This directly addresses the observed failure mode where the injected synthesis asserted 'NO ROWS' and overrode available evidence, while also reducing token usage on the most expensive questions. Keeping all raw rows preserves safe refusals when evidence is truly absent.",
+        "injection": {
+          "include_synthesized_answer": false,
+          "max_rows": null,
+          "drop_columns": [],
+          "max_row_chars": null
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 12,
+        "accuracy_pct": 100.0,
+        "tokens": 52157,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": true,
+      "dev": {
+        "n": 6,
+        "correct": 6,
+        "accuracy_pct": 100.0,
+        "tokens": 14686,
+        "neg_n": 1,
+        "neg_correct": 1
+      },
+      "dev_objective": [
+        100.0,
+        -14686
+      ],
+      "adopted": false
+    },
+    {
+      "cid": "c03",
+      "target": "kb_params",
+      "parent": "seed",
+      "rationale": "A small retrieval-side nudge is the safest way to improve the missed multi-hop recall without changing refusal behavior. The failure shows the agent received no rows for a relationship question spanning sites, measurements, and dominant-species taxonomy. Adding concise retrieval instructions to expand multi-hop/entity-set questions across linked concepts should help fetch the needed ontology rows, while keeping the answer grounded only in returned evidence. Lowering reasoning to low also trims output-token usage on expensive questions without increasing fabrication because the instructions already require refusal when evidence is absent.",
+      "edit": {
+        "target": "kb_params",
+        "rationale": "A small retrieval-side nudge is the safest way to improve the missed multi-hop recall without changing refusal behavior. The failure shows the agent received no rows for a relationship question spanning sites, measurements, and dominant-species taxonomy. Adding concise retrieval instructions to expand multi-hop/entity-set questions across linked concepts should help fetch the needed ontology rows, while keeping the answer grounded only in returned evidence. Lowering reasoning to low also trims output-token usage on expensive questions without increasing fabrication because the instructions already require refusal when evidence is absent.",
+        "kb_params": {
+          "reasoning": "low",
+          "retrieval_instructions": "For questions that ask for entities satisfying a condition across related concepts, retrieve evidence by traversing all relevant ontology relationships implied by the question rather than requiring the condition to appear on the starting entity alone. Include rows for each hop needed to connect the requested entity set to the qualifying attribute, especially for site -> measurement -> dominant species -> taxonomy/type style questions. Prefer recall of the full supporting chain over a narrow direct-match retrieval.",
+          "answer_instructions": null
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 12,
+        "accuracy_pct": 100.0,
+        "tokens": 146364,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": true,
+      "dev": {
+        "n": 6,
+        "correct": 6,
+        "accuracy_pct": 100.0,
+        "tokens": 10228,
+        "neg_n": 1,
+        "neg_correct": 1
+      },
+      "dev_objective": [
+        100.0,
+        -10228
+      ],
+      "adopted": true
+    },
+    {
+      "cid": "c04",
+      "target": "injection",
+      "parent": "c03",
+      "rationale": "Cap the number of injected row blocks to reduce prompt size on the most expensive questions while preserving groundedness and refusal behavior. This is a small, low-risk change because the agent still sees verbatim ontology rows and existing retrieval instructions already favor returning the full supporting relationship chain; limiting row volume trims excess evidence rather than encouraging fabrication.",
+      "edit": {
+        "target": "injection",
+        "rationale": "Cap the number of injected row blocks to reduce prompt size on the most expensive questions while preserving groundedness and refusal behavior. This is a small, low-risk change because the agent still sees verbatim ontology rows and existing retrieval instructions already favor returning the full supporting relationship chain; limiting row volume trims excess evidence rather than encouraging fabrication.",
+        "injection": {
+          "include_synthesized_answer": true,
+          "max_rows": 24,
+          "drop_columns": [],
+          "max_row_chars": null
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 11,
+        "accuracy_pct": 91.67,
+        "tokens": 59710,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": false,
+      "adopted": false
+    },
+    {
+      "cid": "c05",
+      "target": "kb_params",
+      "parent": "c03",
+      "rationale": "A small retrieval-side tightening can cut prompt size on the most expensive answerable questions without changing answer behavior or increasing fabrication risk. Keeping reasoning low and asking for only rows needed to answer/refuse reduces excess supporting chains and duplicate context while preserving the grounded evidence requirement.",
+      "edit": {
+        "target": "kb_params",
+        "rationale": "A small retrieval-side tightening can cut prompt size on the most expensive answerable questions without changing answer behavior or increasing fabrication risk. Keeping reasoning low and asking for only rows needed to answer/refuse reduces excess supporting chains and duplicate context while preserving the grounded evidence requirement.",
+        "kb_params": {
+          "reasoning": "low",
+          "retrieval_instructions": "Retrieve the minimum set of ontology rows needed to answer the question or determine that the data is unavailable. When a question spans related concepts, include only the rows required to connect the entities in scope across those relationships, plus any rows needed to compare candidates or support the final conclusion. Prefer complete-but-compact evidence over broad recall; avoid redundant rows and duplicate paths that do not change the answer.",
+          "answer_instructions": null
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 12,
+        "accuracy_pct": 100.0,
+        "tokens": 152100,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": false,
+      "adopted": false
+    },
+    {
+      "cid": "c06",
+      "target": "injection",
+      "parent": "c03",
+      "rationale": "Trimming oversized row payloads is the safest remaining token-reduction lever: it preserves the verbatim grounded rows, keeps refusal behavior unchanged, and avoids the previously rejected changes to synthesized answers, row-count caps, or retrieval policy. A moderate per-row character cap reduces prompt size most on long-row cases while typically retaining the key entity/value fields needed for correct answers.",
+      "edit": {
+        "target": "injection",
+        "rationale": "Trimming oversized row payloads is the safest remaining token-reduction lever: it preserves the verbatim grounded rows, keeps refusal behavior unchanged, and avoids the previously rejected changes to synthesized answers, row-count caps, or retrieval policy. A moderate per-row character cap reduces prompt size most on long-row cases while typically retaining the key entity/value fields needed for correct answers.",
+        "injection": {
+          "include_synthesized_answer": true,
+          "max_rows": null,
+          "drop_columns": [],
+          "max_row_chars": 600
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 12,
+        "accuracy_pct": 100.0,
+        "tokens": 18752,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": true,
+      "dev": {
+        "n": 6,
+        "correct": 6,
+        "accuracy_pct": 100.0,
+        "tokens": 8963,
+        "neg_n": 1,
+        "neg_correct": 1
+      },
+      "dev_objective": [
+        100.0,
+        -8963
+      ],
+      "adopted": true
+    },
+    {
+      "cid": "c07",
+      "target": "injection",
+      "parent": "c06",
+      "rationale": "Token use is currently inflated by long row payloads. A small, safe reduction is to trim per-row character budget while keeping all rows and columns, which preserves grounded evidence and refusal behavior better than removing synthesized content or hard-capping row count. This reduces verbosity from especially wide rows without changing the answering policy.",
+      "edit": {
+        "target": "injection",
+        "rationale": "Token use is currently inflated by long row payloads. A small, safe reduction is to trim per-row character budget while keeping all rows and columns, which preserves grounded evidence and refusal behavior better than removing synthesized content or hard-capping row count. This reduces verbosity from especially wide rows without changing the answering policy.",
+        "injection": {
+          "include_synthesized_answer": true,
+          "max_rows": null,
+          "drop_columns": [],
+          "max_row_chars": 300
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 8,
+        "accuracy_pct": 66.67,
+        "tokens": 17313,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": false,
+      "adopted": false
+    },
+    {
+      "cid": "c08",
+      "target": "kb_params",
+      "parent": "c06",
+      "rationale": "All train questions are already correct, so the safest improvement is a small retrieval-side token reduction. The current retrieval instruction explicitly prefers recall of the full supporting chain, which can over-fetch rows on expensive answerable questions. Tightening it to retrieve only the minimal connected chain needed to answer should reduce prompt size while preserving groundedness and refusals, because the agent still answers only from returned rows and asks for missing data when a required hop is absent.",
+      "edit": {
+        "target": "kb_params",
+        "rationale": "All train questions are already correct, so the safest improvement is a small retrieval-side token reduction. The current retrieval instruction explicitly prefers recall of the full supporting chain, which can over-fetch rows on expensive answerable questions. Tightening it to retrieve only the minimal connected chain needed to answer should reduce prompt size while preserving groundedness and refusals, because the agent still answers only from returned rows and asks for missing data when a required hop is absent.",
+        "kb_params": {
+          "reasoning": "low",
+          "retrieval_instructions": "For questions that ask for entities satisfying a condition across related concepts, retrieve evidence by traversing the relevant ontology relationships implied by the question and include the rows needed to connect the answer to its qualifying attributes. Prefer the smallest sufficient connected evidence set: include one supporting chain per answer and avoid extra rows that do not change the conclusion. If multiple hops are required, return the minimal rows for each hop; if a required link is absent, do not infer it.",
+          "answer_instructions": null
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 10,
+        "accuracy_pct": 83.33,
+        "tokens": 18468,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": false,
+      "adopted": false
+    },
+    {
+      "cid": "c09",
+      "target": "injection",
+      "parent": "c06",
+      "rationale": "All train questions are already correct, so the safest optimization is a small prompt-size reduction in the injected evidence. The current rows allow up to 600 characters each, which likely includes verbose text that is not needed for the answered questions. Lowering the per-row character cap slightly is a bounded change that reduces tokens while preserving the raw grounded rows and refusal behavior. This avoids changing reasoning or retrieval behavior and does not encourage fabrication.",
+      "edit": {
+        "target": "injection",
+        "rationale": "All train questions are already correct, so the safest optimization is a small prompt-size reduction in the injected evidence. The current rows allow up to 600 characters each, which likely includes verbose text that is not needed for the answered questions. Lowering the per-row character cap slightly is a bounded change that reduces tokens while preserving the raw grounded rows and refusal behavior. This avoids changing reasoning or retrieval behavior and does not encourage fabrication.",
+        "injection": {
+          "include_synthesized_answer": true,
+          "max_rows": null,
+          "drop_columns": [],
+          "max_row_chars": 450
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 12,
+        "accuracy_pct": 100.0,
+        "tokens": 19827,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": false,
+      "adopted": false
+    },
+    {
+      "cid": "c10",
+      "target": "injection",
+      "parent": "c06",
+      "rationale": "All train questions are already correct, so the safest optimization is a small prompt-size reduction that preserves full evidence coverage and refusal behavior. Dropping long free-text notes cuts tokens across expensive questions without removing core structured facts needed to answer, and keeping synthesized answer plus unlimited rows avoids the previously rejected regressions from changing other knobs.",
+      "edit": {
+        "target": "injection",
+        "rationale": "All train questions are already correct, so the safest optimization is a small prompt-size reduction that preserves full evidence coverage and refusal behavior. Dropping long free-text notes cuts tokens across expensive questions without removing core structured facts needed to answer, and keeping synthesized answer plus unlimited rows avoids the previously rejected regressions from changing other knobs.",
+        "injection": {
+          "include_synthesized_answer": true,
+          "max_rows": null,
+          "drop_columns": [
+            "notes"
+          ],
+          "max_row_chars": 600
+        }
+      },
+      "train": {
+        "n": 12,
+        "correct": 11,
+        "accuracy_pct": 91.67,
+        "tokens": 23815,
+        "neg_n": 3,
+        "neg_correct": 3
+      },
+      "promising": false,
+      "adopted": false
+    }
+  ]
+}

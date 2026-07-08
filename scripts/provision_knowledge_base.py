@@ -85,19 +85,28 @@ def _ks_body(cfg: dict[str, str]) -> dict:
     }
 
 
-def _kb_body(cfg: dict[str, str], model: str, reasoning: str) -> dict:
+_BASELINE_ANSWER_INSTRUCTIONS = (
+    "Answer only from retrieved ontology evidence. Do not invent sites, species, counts, or "
+    "treatments. If no rows are returned, say the data is unavailable."
+)
+
+
+def _kb_body(cfg: dict[str, str], model: str, reasoning: str,
+             retrieval_instructions: str | None = None,
+             answer_instructions: str | None = None) -> dict:
     # fabricOntology REQUIRES a synthesis LLM (no 'minimal' reasoning). The LLM authenticates with the
     # search service system-assigned MI (authIdentity=null) which holds Cognitive Services User on the
     # AOAI resource — REQUIRED because that resource has key auth disabled. No key is ever stored (Art. VI).
-    return {
+    #
+    # ``retrieval_instructions`` / ``answer_instructions`` are Phase-6 TUNABLE, frozen-weights TEXT knobs
+    # (issue #29). Defaults reproduce the Phase-5 baseline KB byte-for-byte (no retrievalInstructions key;
+    # the baseline answerInstructions), so an un-optimized re-provision is a no-op.
+    body: dict = {
         "name": cfg["kb"],
         "description": "IQ-NPL ontology knowledge base — adopted grounding path for the Phase-5 agent.",
         "knowledgeSources": [{"name": cfg["ks"]}],
         "outputMode": "answerSynthesis",
-        "answerInstructions": (
-            "Answer only from retrieved ontology evidence. Do not invent sites, species, counts, or "
-            "treatments. If no rows are returned, say the data is unavailable."
-        ),
+        "answerInstructions": answer_instructions or _BASELINE_ANSWER_INSTRUCTIONS,
         "models": [{
             "kind": "azureOpenAI",
             "azureOpenAIParameters": {
@@ -109,6 +118,37 @@ def _kb_body(cfg: dict[str, str], model: str, reasoning: str) -> dict:
         }],
         "retrievalReasoningEffort": {"kind": reasoning},
     }
+    if retrieval_instructions:
+        body["retrievalInstructions"] = retrieval_instructions
+    return body
+
+
+def provision_kb(model: str, reasoning: str = "medium",
+                 retrieval_instructions: str | None = None,
+                 answer_instructions: str | None = None) -> dict:
+    """(Re)provision the KS + KB with the given synthesis model and TUNABLE KB text params.
+
+    Importable by the Phase-6 optimizer (scripts/optimize_harness.py) so a candidate that changes
+    ``retrievalReasoningEffort`` / retrieval / answer instructions can re-provision the KB before rollout.
+    Returns the KB body that was PUT (for the candidate/audit log). Live Azure calls; requires DefaultAzureCredential.
+    """
+    import requests
+    from azure.identity import DefaultAzureCredential
+
+    cfg = _cfg()
+    token = DefaultAzureCredential().get_token(_SEARCH_SCOPE).token
+    headers = _headers(token)
+
+    r = requests.put(_url(cfg, f"knowledgesources/{cfg['ks']}"), headers=headers,
+                     json=_ks_body(cfg), timeout=120)
+    if r.status_code >= 400:
+        raise RuntimeError(f"KS provision failed {r.status_code}: {r.text[:500]}")
+
+    kb_body = _kb_body(cfg, model, reasoning, retrieval_instructions, answer_instructions)
+    r = requests.put(_url(cfg, f"knowledgebases/{cfg['kb']}"), headers=headers, json=kb_body, timeout=120)
+    if r.status_code >= 400:
+        raise RuntimeError(f"KB provision failed {r.status_code}: {r.text[:500]}")
+    return kb_body
 
 
 def _headers(token: str) -> dict[str, str]:
@@ -129,6 +169,10 @@ def main() -> None:
                          "FOUNDRY_MODEL_DEPLOYMENT_NAME.")
     ap.add_argument("--reasoning", default="medium", choices=["low", "medium"],
                     help="KB retrievalReasoningEffort (fabricOntology does not support 'minimal').")
+    ap.add_argument("--retrieval-instructions", default=None,
+                    help="optional KB retrievalInstructions (Phase-6 tunable; default omits the key).")
+    ap.add_argument("--answer-instructions", default=None,
+                    help="optional KB answerInstructions (Phase-6 tunable; default = baseline text).")
     ap.add_argument("--dry-run", action="store_true", help="print the request bodies; make no live calls.")
     ap.add_argument("--cleanup", action="store_true", help="delete the KB then the KS and exit.")
     args = ap.parse_args()
@@ -143,7 +187,8 @@ def main() -> None:
         print(f"PUT knowledgesources/{cfg['ks']}")
         print(json.dumps(_ks_body(cfg), indent=2))
         print(f"PUT knowledgebases/{cfg['kb']}  (synthesis model = {model}, reasoning = {args.reasoning})")
-        print(json.dumps(_kb_body(cfg, model, args.reasoning), indent=2))
+        print(json.dumps(_kb_body(cfg, model, args.reasoning, args.retrieval_instructions,
+                                  args.answer_instructions), indent=2))
         return
 
     import requests
@@ -171,7 +216,8 @@ def main() -> None:
 
     # 2. knowledge base (answerSynthesis, synthesis LLM via search MI)
     r = requests.put(_url(cfg, f"knowledgebases/{cfg['kb']}"), headers=headers,
-                     json=_kb_body(cfg, args.model, args.reasoning), timeout=120)
+                     json=_kb_body(cfg, args.model, args.reasoning, args.retrieval_instructions,
+                                   args.answer_instructions), timeout=120)
     print(f"PUT knowledgebases/{cfg['kb']} (model={args.model}, reasoning={args.reasoning}) -> {r.status_code}")
     if r.status_code >= 400:
         print(r.text[:1500])

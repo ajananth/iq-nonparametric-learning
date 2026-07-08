@@ -1,0 +1,13 @@
+# instructions.md: (unchanged)
+
+# skills/SKILL.md: (unchanged)
+
+# tools.json:grounding.description: (unchanged)
+
+# injection.json
+- baseline: {"include_synthesized_answer": true, "max_rows": null, "drop_columns": [], "max_row_chars": null}
++ optimized: {"include_synthesized_answer": true, "max_rows": null, "drop_columns": [], "max_row_chars": 600}
+
+# kb_params
+- baseline: {"reasoning": "medium", "retrieval_instructions": null, "answer_instructions": null}
++ optimized: {"reasoning": "low", "retrieval_instructions": "For questions that ask for entities satisfying a condition across related concepts, retrieve evidence by traversing all relevant ontology relationships implied by the question rather than requiring the condition to appear on the starting entity alone. Include rows for each hop needed to connect the requested entity set to the qualifying attribute, especially for site -> measurement -> dominant species -> taxonomy/type style questions. Prefer recall of the full supporting chain over a narrow direct-match retrieval.", "answer_instructions": null}
