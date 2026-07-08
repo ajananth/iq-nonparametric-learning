@@ -1,22 +1,21 @@
 {
-  "generated_at": "2026-07-06T06:49:33.978206+00:00",
+  "generated_at": "2026-07-08T04:26:29.601391+00:00",
   "models": [
-    "gpt-5.4",
-    "gpt-5.4-mini"
+    "gpt-5.4"
   ],
   "aggregates": {
     "gpt-5.4": {
       "model": "gpt-5.4",
-      "generated_at": "2026-07-06T06:37:54.001535+00:00",
+      "generated_at": "2026-07-08T04:26:29.592893+00:00",
       "n_tasks": 24,
       "accuracy": {
-        "overall_pct": 29.2,
-        "correct": 7,
+        "overall_pct": 91.7,
+        "correct": 22,
         "by_category": {
           "multi_hop": {
-            "pct": 0.0,
+            "pct": 90.0,
             "n": 10,
-            "correct": 0
+            "correct": 9
           },
           "negative": {
             "pct": 100.0,
@@ -24,115 +23,45 @@
             "correct": 6
           },
           "single_hop": {
-            "pct": 12.5,
+            "pct": 87.5,
             "n": 8,
-            "correct": 1
+            "correct": 7
           }
         }
       },
       "tokens": {
-        "input": 36168,
-        "output": 3625,
-        "total": 39793,
-        "avg_per_task": 1658.0
+        "input": 102760,
+        "output": 4690,
+        "total": 107450,
+        "avg_per_task": 4477.1
       },
       "cost": {
         "pricing_verified": false,
         "pricing_source": "placeholder - replace with your Foundry/AOAI pricing",
-        "total_usd": 0.08146,
-        "avg_per_task_usd": 0.003394,
-        "cost_per_correct_usd": 0.011637
+        "total_usd": 0.17535,
+        "avg_per_task_usd": 0.007306,
+        "cost_per_correct_usd": 0.00797
       },
       "latency_ms": {
-        "avg": 27361,
-        "p50": 24898,
-        "p95": 44472,
-        "max": 59716
+        "avg": 30002,
+        "p50": 26495,
+        "p95": 49498,
+        "max": 52864
       },
       "grounding": {
         "called_fabric_iq_pct": 100.0,
-        "multi_hop_traversal_ok_pct": 0.0,
+        "multi_hop_traversal_ok_pct": 90.0,
         "multi_hop_n": 10
       },
       "frozen_weights": {
         "fine_tuning": false,
         "model_is_deployment_string": true,
         "config_hashes": [
-          "e03c59ade0bc0fa91b025564b9c21c62cca36be32980ec7aa75395223be3407f"
-        ],
-        "single_config": true
-      }
-    },
-    "gpt-5.4-mini": {
-      "model": "gpt-5.4-mini",
-      "generated_at": "2026-07-06T06:49:33.972155+00:00",
-      "n_tasks": 24,
-      "accuracy": {
-        "overall_pct": 25.0,
-        "correct": 6,
-        "by_category": {
-          "multi_hop": {
-            "pct": 0.0,
-            "n": 10,
-            "correct": 0
-          },
-          "negative": {
-            "pct": 100.0,
-            "n": 6,
-            "correct": 6
-          },
-          "single_hop": {
-            "pct": 0.0,
-            "n": 8,
-            "correct": 0
-          }
-        }
-      },
-      "tokens": {
-        "input": 36440,
-        "output": 3582,
-        "total": 40022,
-        "avg_per_task": 1667.6
-      },
-      "cost": {
-        "pricing_verified": false,
-        "pricing_source": "placeholder - replace with your Foundry/AOAI pricing",
-        "total_usd": 0.016274,
-        "avg_per_task_usd": 0.000678,
-        "cost_per_correct_usd": 0.002712
-      },
-      "latency_ms": {
-        "avg": 26566,
-        "p50": 22749,
-        "p95": 55830,
-        "max": 56522
-      },
-      "grounding": {
-        "called_fabric_iq_pct": 100.0,
-        "multi_hop_traversal_ok_pct": 0.0,
-        "multi_hop_n": 10
-      },
-      "frozen_weights": {
-        "fine_tuning": false,
-        "model_is_deployment_string": true,
-        "config_hashes": [
-          "e03c59ade0bc0fa91b025564b9c21c62cca36be32980ec7aa75395223be3407f"
+          "0646fb478d9573d3f110a9a440101ec6399b51b657092e3429ade3f68827e174"
         ],
         "single_config": true
       }
     }
   },
-  "h1_pareto": {
-    "reference_llm": "gpt-5.4",
-    "challenger_slm": "gpt-5.4-mini",
-    "accuracy_slm_ge_llm": false,
-    "accuracy_slm_pct": 25.0,
-    "accuracy_llm_pct": 29.2,
-    "tokens_ratio_slm_over_llm": 1.006,
-    "cost_ratio_slm_over_llm": 0.2,
-    "tokens_much_less": false,
-    "cost_much_less": true,
-    "pareto_win": false,
-    "note": "Baseline (un-optimized) figures. H1 is fully tested after Phase 6 optimization; this scorecard pre-registers the criterion and records the starting point."
-  }
+  "h1_pareto": null
 }

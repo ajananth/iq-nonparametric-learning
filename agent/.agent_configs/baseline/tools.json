@@ -1,13 +1,18 @@
 {
-  "_comment": "Phase 5 (issue #24, EPIC D #4) baseline tool config. VERIFIED shape: fabric_iq_preview is the Foundry server-side tool (docs/verified-capabilities.md §2a; Learn foundry/agents/how-to/tools/fabric-iq, updated 2026-07-03). project_connection_id (REQUIRED) is the id of the Fabric IQ (OneLake Catalog) project connection created in the Foundry portal; server_url is the Ontology MCP endpoint for the live iqnpl_ontology. BOTH come from config/env (.env) — never committed (Art. VI: infra GUIDs are OK, but the connection id is resolved at runtime from FABRIC_IQ_PROJECT_CONNECTION_ID). Tool-optimization target (§3b): the optimizer may refine the DESCRIPTION only, never type/required/defaults. Per Art. IV the description names business concepts, not tables/columns/SQL.",
-  "tools": [
-    {
-      "type": "fabric_iq_preview",
-      "server_label": "fabriciq-iqnpl-ontology",
-      "description": "Answer questions about the water-quality / algal-bloom domain by querying the Fabric IQ ontology (preview). Ask in business terms about monitored water sites and their attributes (location, region, water-body type, whether active); water-quality measurements taken at those sites (readings such as pH, dissolved oxygen, turbidity, chlorophyll-a, nutrients, and algal cell counts); the algae species observed (scientific and common name, taxonomic group, toxicity level, bloom triggers); and the remediation treatments applied at sites (method, outcome, follow-up). You can also ask how these relate: which measurements and treatments belong to a site, and which algae species is dominant in a measurement. Fabric IQ resolves the question via NL2Ontology over the bound OneLake data and returns a grounded answer in the signed-in user's context. Use it for every data-backed claim; do not invent table or column names.",
-      "project_connection_id": "${FABRIC_IQ_PROJECT_CONNECTION_ID}",
-      "server_url": "https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/${FABRIC_WORKSPACE_ID}/items/${FABRIC_ONTOLOGY_ITEM_ID}/ontologyEndpoint",
-      "require_approval": "never"
+  "_comment": "Phase 5 grounding config (issue #24, EPIC D #4) — REWIRED to the ADOPTED knowledge-base retrieve path (docs/verified-capabilities.md §2b). The Foundry hosted-MCP *tool* paths (fabric_iq_preview / generic MCPTool) RAG-chunk the ontology result into an opaque stub with no rows -> hallucination (§2a); the Azure AI Search agentic-retrieval knowledge base over a fabricOntology knowledge source returns REAL verbatim ontology rows. The harness POSTs /knowledgebases/{kb}/retrieve, then injects the returned rows into the agent context before it answers. Infra refs (endpoint/names) come from env (Art. VI). The TUNABLE retrieval knobs + description are the optimizer target (§3b); per Art. IV the description names business concepts, not tables/columns/SQL. retrieve_params.rerankerThreshold MUST stay 0 — the default reranker filters multi-hop answers to empty (verified 2026-07-08).",
+  "grounding": {
+    "type": "fabric_iq_knowledge_base",
+    "server_label": "iqnpl-ontology-kb",
+    "description": "Ground answers about the water-quality / algal-bloom domain in the Fabric IQ ontology. Retrieves real records about monitored water sites and their attributes (location, region, water-body type, whether active); water-quality measurements taken at those sites (readings such as pH, dissolved oxygen, turbidity, chlorophyll-a, nutrients, and algal cell counts); the algae species observed (scientific and common name, taxonomic group, toxicity level, bloom triggers); the remediation treatments applied at sites (method, outcome, follow-up); and how these relate (which measurements and treatments belong to a site, and which algae species is dominant in a measurement). The knowledge base resolves the question via Fabric IQ over the bound OneLake data in the signed-in user's context and returns the matching rows verbatim.",
+    "search_endpoint": "${AZURE_SEARCH_ENDPOINT}",
+    "api_version": "${AZURE_SEARCH_API_VERSION}",
+    "knowledge_source": "${AZURE_SEARCH_KNOWLEDGE_SOURCE}",
+    "knowledge_base": "${AZURE_SEARCH_KNOWLEDGE_BASE}",
+    "retrieve_params": {
+      "kind": "fabricOntology",
+      "includeReferences": true,
+      "includeReferenceSourceData": true,
+      "rerankerThreshold": 0
     }
-  ]
+  }
 }
