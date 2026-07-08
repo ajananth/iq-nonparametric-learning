@@ -12,3 +12,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Phase-6 optimizer candidate scratch (materialized configs); committed outputs live in eval/optimization_runs/
+.optimize_workspace/
