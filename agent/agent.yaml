@@ -1,0 +1,29 @@
+# agent.yaml — hosted Foundry agent manifest (Phase 5, issue #24, EPIC D #4)
+#
+# Declarative pointer to the baseline, optimizer-ready config under .agent_configs/baseline/.
+# The MODEL is a swappable deployment-name string resolved from the environment (Art. III: swapping
+# the model is a config change, never a code rewrite; Art. II: weights are frozen — a deployment name,
+# never trained weights). All infra ids come from env/.env (Art. VI). This manifest mirrors the layout
+# produced by `azd ai agent init` (docs/verified-capabilities.md §3a) so the same config is optimizer-ready.
+
+name: iqnpl-water-analyst
+description: >-
+  Water-quality analyst grounded in the live Fabric IQ `iqnpl_ontology` via the fabric_iq_preview tool.
+  Baseline (un-optimized) agent for the H1 SLM-vs-LLM experiment.
+
+# Swappable model deployment string. The ONLY variable that changes across the H1 run matrix.
+# Resolved at load time from FOUNDRY_MODEL_DEPLOYMENT_NAME; both gpt-5.4 and gpt-5.4-mini are valid.
+model: ${FOUNDRY_MODEL_DEPLOYMENT_NAME}
+
+# Optimizer-tunable, text-space config (loaded by agent/harness.py::load_config).
+config_dir: .agent_configs/baseline
+instructions_file: .agent_configs/baseline/instructions.md   # Instruction-tuning target
+tools_file: .agent_configs/baseline/tools.json               # Tool-optimization target (descriptions only)
+skills_dir: .agent_configs/baseline/skills                   # Skill-improvement target (skill bodies)
+
+# Fabric IQ grounding (values from env; see .env.example). Semantics live in the ontology, not here (Art. IV).
+grounding:
+  tool: fabric_iq_preview
+  project_connection_id: ${FABRIC_IQ_PROJECT_CONNECTION_ID}
+  server_url: https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/${FABRIC_WORKSPACE_ID}/items/${FABRIC_ONTOLOGY_ITEM_ID}/ontologyEndpoint
+  require_approval: never

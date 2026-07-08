@@ -70,10 +70,13 @@ There are **three documented, complementary paths**, and the flagship one is *na
    `https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/<workspace-ID>/items/<ontology-item-ID>/ontologyEndpoint`
    (e.g. registered in `.vscode/mcp.json` as an HTTP server). *(fabric/iq/ontology/how-to-use-ontology-mcp-server)*
 
-> **Decision for this project:** use the **`fabric_iq_preview` tool** (path 2) as the primary way to ground the
-> **hosted Foundry agent** — it is the path the Agent Optimizer and the model-swappability story build on. The
-> **knowledge-base** path (1) is the equivalent portal experience; the **raw MCP endpoint** (3) is the
-> alternative for non-Foundry / editor-based demos.
+> **Decision for this project (UPDATED Phase 5, PR #25, 2026-07-08 — supersedes the original choice):** ground via the
+> **Foundry IQ Knowledge Base** (`fabricOntology`, path 1) — it is the **only** path empirically proven to surface real
+> verbatim ontology rows. The **`fabric_iq_preview` tool** (path 2) and a generic `MCPTool` were **both disqualified**:
+> Foundry's document-chunker exposes **0 rows** from the ontology tool result → hallucination (see §2a addendum). For
+> the experiment baseline we use the KB's manual **`/retrieve` + inject** path (controls in §2c); **native KB attach**
+> (`knowledge_base_retrieve`) is the recommended production pattern. The **raw MCP endpoint** (3) remains the
+> non-Foundry / editor path.
 
 ### 1c. Entra ID auth model & required permissions — Verified (delegated) / gap on SP scopes
 - **Access is identity-based (delegated / user-identity passthrough).** The Foundry IQ knowledge-base flow shows
@@ -110,6 +113,14 @@ There are **three documented, complementary paths**, and the flagship one is *na
   **delegated user identity** (as documented) for the demo; treat any service-principal scope list as
   **Unverified** and re-confirm against the BYO Entra-app registration flow / Fabric REST API docs before it
   enters the public article.
+  > **RESOLVED (Phase 5, PR #25, verified-by-test 2026-07-08) — closes the SP-scopes open item (#11 / item 7 / G2).**
+  > The adopted grounding architecture (Foundry IQ Knowledge Base `fabricOntology` + manual `/retrieve`, §2b)
+  > authenticates entirely via **delegated user identity / managed-OAuth with dual-header OBO forwarding**
+  > (`Authorization` + `x-ms-query-source-authorization`, both the `https://search.azure.com/.default` audience) plus
+  > the **search-service system-assigned MI** for KB synthesis. **No** service-principal `Item.Execute.All` /
+  > `Item.Read.All` scope set was needed — end-to-end grounding (single-hop + multi-hop) succeeded on this path. The
+  > unverified SP-scope gap is therefore **moot for this project**; managed-OAuth/delegated identity is **sufficient
+  > and empirically validated**. *(how-to-create-agent-foundry-iq; agentic-retrieval-how-to-retrieve)*
 
 ---
 
@@ -160,9 +171,11 @@ doc-only claims above where live behaviour diverged. Reproducible via `scripts/`
 
 **Status: `Verified-Preview`** (Fabric IQ grounding is preview; hosted agents are a Foundry Agent Service capability)
 
-**Primary sources (accessed 2026-07-03):**
+**Primary sources (accessed 2026-07-03; §2a–2c re-verified 2026-07-08):**
 - Connect agents to Microsoft Fabric with Fabric IQ (preview) — https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric-iq *(updated 2026-07-01)*
 - Create an Ontology Agent with Foundry IQ — https://learn.microsoft.com/en-us/fabric/iq/ontology/how-to-create-agent-foundry-iq *(updated 2026-06-02)*
+- Create a Knowledge Base (agentic retrieval) — https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-create-knowledge-base *(2026-05-01-preview)*
+- Query a Knowledge Base via API or MCP (retrieve) — https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-retrieve *(2026-05-01-preview)*
 
 ### 2a. Attaching the Fabric IQ tool/connection to a hosted agent — Verified
 - **Tool type: `fabric_iq_preview`** (Python/JS/.NET SDK class `FabricIQPreviewTool`). Requires
@@ -184,8 +197,58 @@ doc-only claims above where live behaviour diverged. Reproducible via `scripts/`
   *(how-to-create-agent-foundry-iq)*
 - **Preview caveat (from the page):** connecting to Fabric IQ may incur cost and may send data outside the Azure
   compliance boundary — must be reviewed against **Art. VI/VII** before any real-data wiring.
+  > **Empirical addendum — root cause of the hosted-MCP-tool grounding failure (Phase 5, PR #25, verified-by-test
+  > 2026-07-08).** Both Foundry **hosted-MCP tool** paths — the **`fabric_iq_preview` tool** (child #26) and a
+  > **generic `MCPTool`** pointed at the same ontology MCP endpoint (child #27) — successfully *reach* the endpoint,
+  > but the ontology's raw-JSON result yields **0 visible chunks in Foundry's document-chunker**: the model sees only
+  > `"Retrieved 1 documents 【5:0†source】 Visible: 0%–100%"` with **no data rows**. The citation/annotation envelope
+  > itself is **not** the bug — the chunker never exposes the rows. Both **gpt-5.4** and **gpt-5.4-mini** then fall
+  > back to **parametric hallucination** (e.g. an invented "Lake Greenwood" instead of the real "Rotorua Drinking
+  > Catchment"). A raw call to the **same** Fabric endpoint returns healthy structured rows, so the endpoint is fine —
+  > the loss is in Foundry's **tool-result chunking layer**. => the tool path is **unsuitable for grounding**; use the
+  > Knowledge Base path (§2b). *(tools/fabric-iq; how-to-create-agent-foundry-iq)*
 
-### 2b. Keeping model weights frozen (config) — Verified by construction (supports Art. II & III)
+### 2b. Grounding via the Foundry IQ **Knowledge Base** (`fabricOntology`) — Verified-by-test (adopted)
+The Azure AI Search **agentic-retrieval Knowledge Base** with a **`fabricOntology`** knowledge source surfaces **REAL
+verbatim ontology rows** (unlike the tool paths in §2a). Two consumption modes, **both empirically grounded** (Phase 5,
+2026-07-08):
+- **Manual `/retrieve` + inject (this project's experiment harness).**
+  `POST {searchEndpoint}/knowledgebases/{kb}/retrieve?api-version=2026-05-01-preview`. Verified load-bearing knobs:
+  - **`rerankerThreshold: 0`** (in `knowledgeSourceParams[]`) — WITHOUT it the default reranker filters **multi-hop**
+    answers to empty (`count:0`). It is a **per-retrieve-call** param, **NOT** a KB-level property (the KB object only
+    carries `retrievalInstructions` / `answerInstructions` / `outputMode` / `knowledgeSources` / `models` /
+    `retrievalReasoningEffort`). This is why it **cannot** be pinned on a natively-attached KB (§2c).
+  - **`includeReferenceSourceData: true`** → verbatim rows at `references[].sourceData.fabricRawData` (CSV) plus a
+    synthesized `fabricAnswer`.
+  - **Dual-auth OBO forwarding:** `Authorization: Bearer <token>` **and** `x-ms-query-source-authorization: <bare token>`
+    (end-user identity forwarded to Fabric; note the second header is the **bare** token, no `Bearer` prefix). Token
+    audience **`https://search.azure.com/.default`** via `DefaultAzureCredential`.
+  - **Synthesis LLM required:** a `fabricOntology` KB **must** specify an Azure OpenAI model (no `minimal`/extractive
+    mode). Synthesis runs under the **search service system-assigned MI** (needs **Cognitive Services User** on the
+    AOAI resource) — required here because the AOAI resource has **key auth disabled**.
+  - Tooling: **`scripts/provision_knowledge_base.py`** (idempotent KS+KB provisioning), **`agent/harness.py`**
+    (`/retrieve` → inject grounded rows → `responses.create`).
+- **Native `knowledge_base_retrieve` agent attachment.** The Foundry agent's **Knowledge → + Add knowledge** flow
+  attaches the same KB and the agent runtime issues retrieve via **its own managed identity** (no container deploy).
+  Empirically it **grounds**, BUT it exposes **no `rerankerThreshold` knob** → hard **multi-hop is flaky (2/4** in child
+  #27's probe), and it returns only a synthesized answer + citations (not the verbatim `fabricRawData` rows).
+- *(how-to-create-agent-foundry-iq; agentic-retrieval-how-to-create-knowledge-base; agentic-retrieval-how-to-retrieve —
+  all fetched primary 2026-07-08)*
+
+### 2c. Adopted architecture — native attach = production, retrieve+inject = experiment
+- **Native `knowledge_base_retrieve` attachment = the recommended PRODUCTION / shipping pattern** (least code, the
+  documented happy path, agent-managed identity, no container to deploy).
+- **Manual `/retrieve` + inject = the EXPERIMENT / baseline surface** for this project, chosen for three controls the
+  eval depends on:
+  1. **Settable `rerankerThreshold: 0`** → multi-hop reliability (native attach cannot pin it → multi-hop flaky 2/4).
+  2. **Verbatim rows** (`fabricRawData`) captured for the scorer's **groundedness / traversal-correctness** metric
+     family (native attach yields only synthesized text).
+  3. **Always-on grounding held constant** across models — the **model deployment string is the ONLY variable**
+     (single-variable fairness, Art. III); native attach's router may skip the KB per question.
+- This is a **scoping decision, not a capability claim** — native attach fully grounds; it simply lacks the
+  experimental controls H1 requires. *(Phase 5, PR #25, 2026-07-08)*
+
+### 2d. Keeping model weights frozen (config) — Verified by construction (supports Art. II & III)
 - A hosted agent references a **model *deployment* by name** (a config string), not trainable weights. Swapping
   the model is a config/deployment change — **no code rewrite** (Art. III swappability).
 - The optimization path (§3) changes **only text/config** — instructions, skills, tool descriptions, and **model
@@ -358,9 +421,11 @@ Per **Art. I.5**, inaccuracies in the Gemini-generated source are corrected here
    `gpt-5.5`, `DeepSeek-V4-Pro`, `DeepSeek-V-3.2`** (gpt-5 family **or** DeepSeek); `gpt-5.3` is no longer listed and
    `gpt-5.4` **was empirically accepted** by the service in our spike. Any deployed chat model may serve as
    `eval_model`. See §3c.
-7. **Entra `Item.Execute.All` / `Item.Read.All` scopes — unverified.** Documented access is **delegated user
-   identity** + a **BYO Entra app via managed OAuth**, with RBAC **Foundry User** + **Foundry Project Manager**
-   (see §1c/§2a). Do not publish those scope strings as fact until confirmed in the app-registration flow.
+7. **Entra `Item.Execute.All` / `Item.Read.All` scopes — unverified → RESOLVED (Phase 5, 2026-07-08).** Documented
+   access is **delegated user identity** + a **BYO Entra app via managed OAuth**, with RBAC **Foundry User** +
+   **Foundry Project Manager** (see §1c/§2a). **Closed:** the adopted KB `/retrieve` grounding path (§2b) works fully on
+   **delegated identity / managed-OAuth + dual-header OBO + search-service MI** — no SP scope set required (§1c
+   RESOLVED note). Do not publish the SP scope strings as fact; they are simply **not needed** for this project.
 8. **Optimizer availability — clarified, then re-tested.** *(Phase 0)* it was described as a **limited preview gated
    by a subscription allow-list** ("contact your Microsoft representative"; 403 otherwise). **Update (2026-07-03):**
    the docs **still carry** allow-list / intake-form language, but the gate was **empirically not enforced** on our
@@ -370,7 +435,7 @@ Per **Art. I.5**, inaccuracies in the Gemini-generated source are corrected here
 | # | Gap / risk | Impact | Fallback |
 | --- | --- | --- | --- |
 | G1 | **Agent Optimizer preview gating** (§3) — **RESOLVED-BY-TEST** | Native optimization demo | **Empirically accessible on our subscription (2026-07-03):** `azd ai agent optimize` submitted a real job with no 403. Preview sign-up / allow-list language persists in the docs but was **not enforced** for us. Native path viable; **SkillOpt (§4) is now a fallback, not a necessity**. (Two beta tooling defects noted in §3d; final candidate scoring to be exercised in Phase 6.) |
-| G2 | **Service-principal Entra scopes for Fabric IQ undocumented** (§1c) | Automation/CI (non-interactive) auth uncertain | Use **delegated user identity** as documented; re-verify SP scopes before publication |
+| G2 | **Service-principal Entra scopes for Fabric IQ undocumented** (§1c) — **RESOLVED-BY-TEST (2026-07-08)** | Automation/CI (non-interactive) auth uncertain | **Not needed:** the adopted KB `/retrieve` grounding path (§2b) works on **delegated identity / managed-OAuth + dual-header OBO + search-service system-MI**; end-to-end grounding validated with **no** SP `Item.*` scopes. Delegated/managed-OAuth is sufficient (see §1c RESOLVED note). |
 | G3 | Ontology **binding limitations** (managed tables, no OneLake security, no column mapping) | Constrains fixture design | Design Phase 3 synthetic fixtures to comply from the start |
 | G4 | Graph feature needs **tenant Graph setting**; upstream data needs **manual refresh** | Setup/latency friction | Document as prerequisites; script the refresh in the repo |
 | G5 | Fabric IQ preview may **incur cost / send data outside the Azure compliance boundary** (§2a) | Compliance (Art. VI/VII) | Gate real-data wiring behind explicit approval; keep synthetic fixtures for the public demo |

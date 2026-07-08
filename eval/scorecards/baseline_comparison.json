@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-07-08T04:26:29.601391+00:00",
+  "models": [
+    "gpt-5.4"
+  ],
+  "aggregates": {
+    "gpt-5.4": {
+      "model": "gpt-5.4",
+      "generated_at": "2026-07-08T04:26:29.592893+00:00",
+      "n_tasks": 24,
+      "accuracy": {
+        "overall_pct": 91.7,
+        "correct": 22,
+        "by_category": {
+          "multi_hop": {
+            "pct": 90.0,
+            "n": 10,
+            "correct": 9
+          },
+          "negative": {
+            "pct": 100.0,
+            "n": 6,
+            "correct": 6
+          },
+          "single_hop": {
+            "pct": 87.5,
+            "n": 8,
+            "correct": 7
+          }
+        }
+      },
+      "tokens": {
+        "input": 102760,
+        "output": 4690,
+        "total": 107450,
+        "avg_per_task": 4477.1
+      },
+      "cost": {
+        "pricing_verified": false,
+        "pricing_source": "placeholder - replace with your Foundry/AOAI pricing",
+        "total_usd": 0.17535,
+        "avg_per_task_usd": 0.007306,
+        "cost_per_correct_usd": 0.00797
+      },
+      "latency_ms": {
+        "avg": 30002,
+        "p50": 26495,
+        "p95": 49498,
+        "max": 52864
+      },
+      "grounding": {
+        "called_fabric_iq_pct": 100.0,
+        "multi_hop_traversal_ok_pct": 90.0,
+        "multi_hop_n": 10
+      },
+      "frozen_weights": {
+        "fine_tuning": false,
+        "model_is_deployment_string": true,
+        "config_hashes": [
+          "0646fb478d9573d3f110a9a440101ec6399b51b657092e3429ade3f68827e174"
+        ],
+        "single_config": true
+      }
+    }
+  },
+  "h1_pareto": null
+}
