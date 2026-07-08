@@ -1,0 +1,15 @@
+{
+  "include_synthesized_answer": true,
+  "max_rows": null,
+  "drop_columns": [
+    "Site_json",
+    "site_json",
+    "species_json",
+    "measurement_json",
+    "treatment_record_json",
+    "hasTreatment_json",
+    "hasMeasurement_edge_json",
+    "dominantSpecies_edge_json"
+  ],
+  "max_row_chars": null
+}
