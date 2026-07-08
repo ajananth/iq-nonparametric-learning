@@ -66,27 +66,79 @@ def _substitute_env(text: str, *, strict: bool) -> str:
     return _ENV_RE.sub(repl, text)
 
 
+# --------------------------------------------------------------------------------------------------
+# Row-injection format (a Phase-6 TUNABLE, frozen-weights TEXT surface — issue #29).
+# The DEFAULTS below reproduce the Phase-5 baseline injection BYTE-FOR-BYTE; a config dir may override
+# them via an optional ``injection.json``. With the defaults (or no injection.json) the grounded input is
+# identical to Phase 5, so the baseline scorecard stays reproducible and the grounding MECHANISM
+# (retrieve+inject, rerankerThreshold:0, dual-auth) is unchanged baseline->optimized (single-variable).
+# --------------------------------------------------------------------------------------------------
+_INJECTION_DEFAULTS: dict[str, Any] = {
+    "include_synthesized_answer": True,  # include the Fabric IQ synthesized summary block
+    "max_rows": None,                    # cap the number of verbatim reference blocks (None = all)
+    "drop_columns": [],                  # CSV column names to drop from each injected reference block
+    "max_row_chars": None,               # truncate each reference block to N chars (None = full)
+}
+
+
+def _resolve_injection(spec: dict[str, Any] | None) -> dict[str, Any]:
+    """Overlay a partial injection spec onto the byte-identical baseline defaults."""
+    resolved = dict(_INJECTION_DEFAULTS)
+    if spec:
+        resolved.update({k: v for k, v in spec.items() if k in _INJECTION_DEFAULTS})
+    return resolved
+
+
+def _project_csv(block: str, drop_columns: list[str]) -> str:
+    """Drop named columns from a CSV reference block (header + data rows). Unknown names are ignored.
+
+    Kept deliberately simple/generic (splits on commas): the ontology rows are flat CSV. Per Art. IV the
+    *which* columns to drop is text-space CONFIG (an optimizer choice), not business logic in code.
+    """
+    import csv as _csv
+    import io as _io
+
+    if not drop_columns:
+        return block
+    reader = list(_csv.reader(_io.StringIO(block)))
+    if not reader:
+        return block
+    header = reader[0]
+    keep = [i for i, c in enumerate(header) if c not in drop_columns]
+    out = _io.StringIO()
+    writer = _csv.writer(out, lineterminator="\n")
+    for row in reader:
+        writer.writerow([row[i] for i in keep if i < len(row)])
+    return out.getvalue().rstrip("\n")
+
+
 @dataclass
 class AgentConfig:
-    """Loaded, optimizer-ready text-space config for the baseline agent."""
+    """Loaded, optimizer-ready text-space config for the agent (baseline or optimized)."""
 
     instructions: str
     tool_spec: dict[str, Any]
     skills: list[str] = field(default_factory=list)
+    injection: dict[str, Any] = field(default_factory=dict)
+    has_injection_file: bool = False
     config_dir: Path = _AGENT_DIR / ".agent_configs" / "baseline"
 
     def config_hash(self) -> str:
         """Deterministic hash of the *tunable* config, with env tokens un-substituted (no secrets).
 
         This is the fairness fingerprint: identical across every model in a run proves that only the model
-        deployment string varied (Art. III / experiment protocol single-variable control).
+        deployment string varied (Art. III / experiment protocol single-variable control). The optional
+        ``injection.json`` is folded in ONLY when present, so a config dir without it (the Phase-5 baseline)
+        hashes exactly as it did in Phase 5, while an optimized config's injection format is captured.
         """
         raw_tools = (self.config_dir / "tools.json").read_text(encoding="utf-8")
-        payload = {
+        payload: dict[str, Any] = {
             "instructions": self.instructions,
             "tools": _substitute_env(raw_tools, strict=False),
             "skills": self.skills,
         }
+        if self.has_injection_file:
+            payload["injection"] = (self.config_dir / "injection.json").read_text(encoding="utf-8")
         blob = json.dumps(payload, sort_keys=True, ensure_ascii=False).encode("utf-8")
         return hashlib.sha256(blob).hexdigest()
 
@@ -100,7 +152,7 @@ class AgentConfig:
 
 
 def load_config(config_dir: Path | str = AgentConfig.config_dir) -> AgentConfig:
-    """Load instructions.md, tools.json (env-substituted), and any skills/*/SKILL.md."""
+    """Load instructions.md, tools.json (env-substituted), skills/*/SKILL.md, and optional injection.json."""
     config_dir = Path(config_dir)
     instructions = (config_dir / "instructions.md").read_text(encoding="utf-8")
 
@@ -113,8 +165,13 @@ def load_config(config_dir: Path | str = AgentConfig.config_dir) -> AgentConfig:
         for skill_file in sorted(skills_dir.rglob("SKILL.md")):
             skills.append(skill_file.read_text(encoding="utf-8"))
 
+    injection_path = config_dir / "injection.json"
+    has_injection_file = injection_path.is_file()
+    injection = json.loads(injection_path.read_text(encoding="utf-8")) if has_injection_file else {}
+
     return AgentConfig(
-        instructions=instructions, tool_spec=tool_spec, skills=skills, config_dir=config_dir
+        instructions=instructions, tool_spec=tool_spec, skills=skills, injection=injection,
+        has_injection_file=has_injection_file, config_dir=config_dir,
     )
 
 
@@ -235,9 +292,15 @@ def _kb_retrieve(credential: Any, question: str, spec: dict[str, Any]) -> Ground
     )
 
 
-def _compose_grounded_input(question: str, gr: GroundingResult) -> str:
+def _compose_grounded_input(question: str, gr: GroundingResult, injection: dict[str, Any] | None = None) -> str:
     """Build the agent input: the question plus the authoritative grounded rows (or an explicit no-data
-    marker). The instructions require the model to answer ONLY from this block."""
+    marker). The instructions require the model to answer ONLY from this block.
+
+    ``injection`` is the Phase-6 tunable row-injection format (issue #29). With its defaults (or when omitted)
+    the output is BYTE-IDENTICAL to the Phase-5 baseline; overrides can trim tokens (drop free-text columns,
+    cap/truncate rows) or drop the synthesized summary while holding the grounding mechanism constant.
+    """
+    inj = _resolve_injection(injection)
     lines = [
         "# Question",
         question,
@@ -251,14 +314,26 @@ def _compose_grounded_input(question: str, gr: GroundingResult) -> str:
         lines.append("NO ROWS were returned for this question.")
         lines.append("You must reply that the data is unavailable; do NOT fabricate an answer.")
     else:
-        if gr.synthesized_answer:
+        if inj["include_synthesized_answer"] and gr.synthesized_answer:
             lines.append("## Fabric IQ summary")
             lines.append(gr.synthesized_answer)
             lines.append("")
         lines.append("## Verbatim rows (CSV)")
-        for i, raw in enumerate(gr.raw_rows, 1):
+        rows = gr.raw_rows
+        total = len(rows)
+        cap = inj["max_rows"]
+        shown = rows[:cap] if cap is not None else rows
+        for i, raw in enumerate(shown, 1):
+            block = raw.strip()
+            if inj["drop_columns"]:
+                block = _project_csv(block, list(inj["drop_columns"]))
+            if inj["max_row_chars"] is not None:
+                block = block[: int(inj["max_row_chars"])]
             lines.append(f"### reference {i}")
-            lines.append(raw.strip())
+            lines.append(block)
+        if cap is not None and total > len(shown):
+            lines.append(f"### note")
+            lines.append(f"{len(shown)} of {total} references shown (older/less-relevant rows omitted).")
     return "\n".join(lines)
 
 
@@ -287,9 +362,12 @@ class InvokeResult:
 class AgentHarness:
     """Create, invoke, and tear down a hosted Foundry agent version. Model is a parameter used end-to-end."""
 
-    def __init__(self, endpoint: str | None = None) -> None:
+    def __init__(self, endpoint: str | None = None, config_dir: Path | str | None = None) -> None:
         self.endpoint = endpoint or os.environ["FOUNDRY_PROJECT_ENDPOINT"]
-        self._cfg = load_config()
+        # Config dir is selectable so the optimizer (issue #29) can point the SAME code at a candidate /
+        # the optimized config. Precedence: explicit arg > IQNPL_AGENT_CONFIG_DIR env > baseline default.
+        resolved_dir = config_dir or os.environ.get("IQNPL_AGENT_CONFIG_DIR") or AgentConfig.config_dir
+        self._cfg = load_config(resolved_dir)
         self._credential = None
         self._project = None
         self._openai = None
@@ -354,7 +432,7 @@ class AgentHarness:
         # 1. Grounding — retrieve verbatim ontology rows (the retrieve is the groundedness evidence).
         gr = _kb_retrieve(self._credential, prompt, self._cfg.grounding)
         tool_calls = [gr.as_tool_call()]
-        grounded_input = _compose_grounded_input(prompt, gr)
+        grounded_input = _compose_grounded_input(prompt, gr, self._cfg.injection)
 
         # 2. Answer — the agent reasons ONLY over the injected rows (same model as KB synthesis).
         try:
