@@ -13,8 +13,8 @@
 
 ## 1. Working title + one-line thesis / demo hook
 
-**Working title (lead candidate):**
-> **"Freeze the Model, Optimize the Harness: Non-Parametric Learning on the Microsoft IQ Stack"**
+**Working title (lead candidate) — final title, merged in #35:**
+> **"Optimize the Harness — Non-Parametric Learning on the Microsoft IQ Stack"**
 
 **Alternate titles (for editorial choice):**
 - "Your Enterprise Data Deserves a Semantic Contract — Not a Prompt: Fabric IQ + Foundry for a Water Utility"
