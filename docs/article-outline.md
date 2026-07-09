@@ -200,9 +200,12 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
   smaller/mini vs an open-weights model) and produce a **cost-vs-accuracy scorecard**, aiming to show a
   smaller optimized model *approaching* a flagship. *(verified-capabilities §3b.)*
 - **Honesty guardrails:** (a) the model-selection sweep runs through the **gated** optimizer, so the
-  fallback path applies (§S7 / #10); (b) do **not** claim a specific smaller model "matches" a flagship
-  until Phase 7 produces real numbers — the draft carries a placeholder flagged as unverified (Art. I);
-  (c) supported `optimization_model` values are exactly **gpt-5 / gpt-5.1 / gpt-5.3**.
+  fallback path applies (§S7 / #10); (b) **RESOLVED (Phase 7, 2026-07-08)** — the config-only swap produced
+  **real** numbers: `gpt-5.4-mini` **87.5% (21/24)** vs flagship **91.7% (22/24)**, matching **within noise**
+  (paired Δ 95% CI [−12.5, 0.0] includes 0; shared S01/M06 misses) at **~8× cheaper**, but **NOT a strict
+  Pareto win** (state plainly). The finished article states this as fact with citation, no placeholder
+  (`eval/showdown/RESULTS.md`); (c) supported `optimization_model` values — see verified-capabilities §3c
+  (the earlier narrow list is superseded; the article does not enumerate it).
 - **Claims-to-verify:** verified-capabilities §2b, §3b, §3c; results are Phase-7 outputs, not yet real.
 
 ---
@@ -220,7 +223,7 @@ Every technical assertion in the finished article must carry an inline citation 
 | C4 | Weights stay frozen; optimization is text/config only | `Verified-Preview` (by construction) | §2b / §3 | Central to Art. II — no weight-update step anywhere |
 | C5 | Foundry Agent Optimizer: four targets, `eval.yaml` shape, score bands | `Gated` (preview + allow-list) | §3, §3a–§3c | **Prominent 403/allow-list flag (#10)**; `optimization_model` ∈ {gpt-5, gpt-5.1, gpt-5.3} only |
 | C6 | SkillOpt = research anchor + drop-in fallback loop | `Verified-GA` | §4 | Attribute to Microsoft Research (Art. VII.2); arXiv:2605.23904, MIT repo |
-| C7 | Model swappability = config-only deployment swap + model-selection sweep | `Verified-Preview` | §2b / §3b | Cost/accuracy numbers are Phase-7 outputs — **do not state as fact yet** |
+| C7 | Model swappability = config-only deployment swap + model-selection sweep | `Verified-Preview` | §2b / §3b | **RESOLVED (Phase 7, 2026-07-08):** config-only swap → `gpt-5.4-mini` **87.5% (21/24)** vs flagship **91.7% (22/24)** at **~12% cost (~8× cheaper)**; within noise (paired Δ 95% CI [−12.5, 0.0] includes 0), **NOT a strict Pareto win**. Source: `eval/showdown/RESULTS.md`, `eval/scorecards/optimized_gpt-5.4-mini.*` |
 | C8 | Auth = delegated user identity; RBAC Foundry User + Project Manager | `Verified-Preview` | §1c / §2a | Service-principal Entra scopes are **Unverified** (Corrections #7, G2) |
 | C9 | Fabric IQ preview may incur cost / send data outside Azure compliance boundary | `Verified-Preview` | §2a | Real-data wiring gated behind approval (Art. VI/VII, G5); public demo uses synthetic fixtures |
 
@@ -266,6 +269,8 @@ the repo is **not** made public, without explicit user approval for that specifi
       dedicated section (§S5.5 / §4a and §S9 / §4b).
 - [ ] Semantics live in the ontology, not prompts (Art. IV) — asserted and demonstrated.
 - [ ] Optimizer allow-list gate (#10) and SkillOpt fallback are flagged **honestly and prominently** (§S7).
-- [ ] Cost/accuracy swappability numbers are marked as Phase-7 outputs, not stated as fact until real.
+- [x] Cost/accuracy swappability numbers are **now real Phase-7 outputs** and stated as fact with citation
+      (`eval/showdown/RESULTS.md`; scorecards) — no remaining placeholders. Framed honestly as within-noise /
+      not-strict-Pareto.
 - [ ] Repo stays private; publication + public-push are explicit approval gates (Art. VIII).
 - [ ] Delivered as Issue #13 → PR, left unmerged for review (Art. XIII).
