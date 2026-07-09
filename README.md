@@ -281,9 +281,14 @@ stronger than the strict test: the SLM **matches the flagship within noise**:
   distinguishable accuracy gap**.
 - Its two **genuine** misses (**S01, M06**) are **identical to the flagship's** (an ontology-flag/SQL quirk
   and a no-rows retrieval — **zero model-attributable gap**).
-- The **3rd** miss (**M04**) is **model-independent retrieval column-projection variance** — an isolation
-  probe (M04+M10 re-invoked 10× each) passes **14/15 (93%)** conditioned on a well-formed retrieval, i.e.
-  flagship parity within noise. It would break the flagship identically.
+- The **3rd** miss is **not fixed** — across the two full runs it **rotates** (run 1: **M10** via an HTTP-429
+  infra throttle; run 2 [enshrined]: **M04** via retrieval column-projection variance), which is itself the
+  evidence that the 3rd slot is **model-independent retrieval variance**. An isolation probe (M04+M10
+  re-invoked 10× each) passes **14/15 (93%)** conditioned on a well-formed retrieval — flagship parity within
+  noise; it would break the flagship identically.
+- **Symmetric caveat:** the flagship **91.7% is itself a single stochastic run** carrying the same ±1
+  multi-hop retrieval variance — it was not re-measured and could itself draw 21/24 on a re-roll. The gap is
+  not a fixed model property.
 - Cost: **~12% of the flagship (7.8–8.4× cheaper)** at **~66% of the tokens**.
 
 **So:** pick the model per workload — the flagship for extra multi-hop robustness, the SLM when cost dominates
