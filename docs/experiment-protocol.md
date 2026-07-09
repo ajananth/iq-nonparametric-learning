@@ -59,7 +59,7 @@ statistically distinguishable accuracy gap at N=24.
 **Dropped: the ontology ON/OFF ablation.** With synthetic data, an ungrounded agent has no way to know the
 values and collapses to ~0% — a tautological result. Goal #2 ("Fabric IQ drives the answers") is instead
 evidenced by the **groundedness** and **multi-hop traversal-correctness** metrics (§3.5) plus multi-hop
-success rate: the agent demonstrably calls `fabric_iq_preview` and the ontology resolves the joins.
+success rate: the agent demonstrably calls the Fabric IQ **KB retrieve** (`fabric_kb_retrieve`) and the ontology resolves the joins.
 
 ### Single-variable fairness control (the core of the experiment)
 
@@ -105,7 +105,7 @@ between models, which is robust to the absolute rate.
 Wall-clock ms per task; aggregate avg / p50 / p95 / max.
 
 ### 3.5 Groundedness & traversal-correctness
-From the tool-call logs: did the agent call `fabric_iq_preview` (groundedness)? For multi-hop questions,
+From the tool-call logs: did the agent call the Fabric IQ **KB retrieve** (`fabric_kb_retrieve`, groundedness)? For multi-hop questions,
 **traversal-correctness** is credited when the tool was called **and** the answer matches ground truth —
 evidence the ontology resolved the multi-relationship path (e.g.
 `Site→hasMeasurement→WaterQualityMeasurement→dominantSpecies→AlgaeSpecies`). Raw dispatched queries are

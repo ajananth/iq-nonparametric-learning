@@ -39,7 +39,7 @@ any Fabric/Foundry provisioning as part of Phase 2.
   - **`Graph in Microsoft Fabric`** — required for the graph feature / GQL traversal used by NL2Ontology.
     *(verified-capabilities.md §1a, §1c)*
   - Fabric **data agent** / **operations agent** tenant settings are required **only** if the ontology is
-    consumed through those agents (not required for the `fabric_iq_preview` tool path we use).
+    consumed through those agents (not required for the Foundry IQ knowledge-base retrieve+inject path we use).
 
 **Binding constraints to design fixtures around (Phase 3/4):** Lakehouse tables must be **managed**, must
 **not** have OneLake security enabled, and must **not** have column mapping enabled; upstream row changes
@@ -56,12 +56,14 @@ require a **manual graph refresh**. *(verified-capabilities.md §1a; risk G3/G4)
 - **At least one model deployment** (a **GPT-5 family** chat-completion deployment — the demo baseline in the
   plan is GPT-5.4). A hosted agent references a **model *deployment* by name** (a config string), so the model
   stays a swappable commodity (Art. III) and weights stay frozen (Art. II). *(verified-capabilities.md §2b)*
-- **Azure RBAC (for the `fabric_iq_preview` tool):**
+- **Azure RBAC (Foundry project + Fabric IQ knowledge-base grounding):**
   - **Foundry User** on the project — for the developer identity, the agent runtime identity, and any user
     identity used in OAuth flows.
   - **Foundry Project Manager** — to create the Fabric IQ connection.
   - Invoking users also need a **Microsoft Fabric license** with access to the queried items.
-  *(verified-capabilities.md §1c; tools/fabric-iq)*
+  - The adopted KB `/retrieve` path also uses the **search service's system-assigned managed identity**
+    (**Cognitive Services User** on the Azure OpenAI resource) for knowledge-base synthesis.
+  *(verified-capabilities.md §1c, §2b; tools/fabric-iq)*
 
 ---
 
@@ -71,9 +73,10 @@ require a **manual graph refresh**. *(verified-capabilities.md §1a; risk G3/G4)
 **Source:** `docs/verified-capabilities.md` §1c, §2a; Corrections #7; risk G2.
 
 - **Delegated user identity (verified path).** Access is identity-based / user-identity passthrough: the
-  `fabric_iq_preview` tool runs **all requests in the context of the signed-in user**, honouring Fabric
-  permissions/governance. The signed-in identity must have access to **both** the Fabric workspace **and**
-  the Foundry project. This is the path the demo uses.
+  KB `/retrieve` call forwards the end-user identity to Fabric via **dual-header OBO**
+  (`Authorization` + `x-ms-query-source-authorization`), so **all requests run in the context of the
+  signed-in user**, honouring Fabric permissions/governance. The signed-in identity must have access to
+  **both** the Fabric workspace **and** the Foundry project. This is the path the demo uses.
 - **BYO Entra app + managed OAuth.** A bring-your-own **Microsoft Entra app registration** provides managed
   OAuth (Foundry API token scope `https://ai.azure.com/.default`).
 - **⚠️ Service-principal scopes are `Unverified` (tracked in #11).** The source PDF's specific

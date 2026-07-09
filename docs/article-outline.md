@@ -80,10 +80,11 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 - **NL2Ontology** querying: business-term questions → structured queries dispatched to the most efficient
   engine (**GQL** for Graph in Fabric, **KQL** for Eventhouse).
 - **Azure AI Foundry Agent Service:** hosts the agent (model deployment + instructions + tools) and grounds
-  it in Fabric IQ via the **`fabric_iq_preview`** tool (built on MCP transport).
+  it in Fabric IQ via the **Foundry IQ Knowledge Base `/retrieve` + inject** path (the native
+  `fabric_iq_preview` tool was disqualified 2026-07-08 — §2a/§2b).
 - Explicitly state **preview status + date** and the tenant/capacity prerequisites at a high level.
 - **Claims-to-verify:** ties to verified-capabilities **§1** (ontology), **§1b** (three grounding paths;
-  we use `fabric_iq_preview`), **§2a** (tool wiring). Preview, verified 2026-07-03.
+  we use the **KB retrieve+inject** path — §2b, adopted 2026-07-08), **§2a/§2b** (grounding wiring). Preview, verified 2026-07-03.
 
 ### S3. Non-parametric learning — optimize the harness, freeze the weights
 - Define the term for this context: **the model's weights never change**; all optimization happens in
@@ -131,8 +132,9 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 #### S5.5 — HEADLINE #1: The Fabric IQ ↔ Foundry semantic contract *(dedicated — see §4a)*
 
 ### S6. The Foundry agent harness
-- Define the hosted agent: **model deployment (by name) + `instructions.md` + tools** — with the Fabric IQ
-  grounding tool `fabric_iq_preview` (`FabricIQPreviewTool`, `azure-ai-projects >= 2.2.0`).
+- Define the hosted agent: **model deployment (by name) + `instructions.md` + tools** — grounded via the
+  Fabric IQ **Knowledge Base `/retrieve` + inject** path (the harness POSTs `/knowledgebases/{kb}/retrieve`
+  and injects verbatim ontology rows; `azure-ai-projects >= 2.2.0` for the hosted-agent client). *(§2b.)*
 - Auth model stated accurately: **delegated user identity** (requests run in the signed-in user's context,
   honoring Fabric permissions) + BYO Entra app via managed OAuth; RBAC **Foundry User** + **Foundry Project
   Manager**. *(verified-capabilities §1c, §2a.)*
@@ -182,8 +184,8 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 
 ### 4a. HEADLINE #1 — The Fabric IQ ↔ Foundry semantic contract (article §S5.5)
 - **Claim:** data structure + business vocabulary live in the **ontology**, not in prompts; the agent
-  queries semantics via NL2Ontology / the `fabric_iq_preview` tool, with **no raw SQL/schema coupling** in
-  the harness. *(Art. IV; verified-capabilities §1, §1b, §2a.)*
+  queries semantics via NL2Ontology / the Fabric IQ **KB retrieve+inject** path, with **no raw SQL/schema coupling** in
+  the harness. *(Art. IV; verified-capabilities §1, §1b, §2b.)*
 - **Cross-domain graph traversal:** one question joins sites, measurements, species toxicity, and treatment
   history via typed relationships — something prompt-stuffing cannot do reliably.
 - **Fails safely:** because access is **delegated / identity-based**, out-of-scope or unauthorized data
@@ -218,7 +220,7 @@ Every technical assertion in the finished article must carry an inline citation 
 | # | Article claim | Status | Source (in verified-capabilities.md) | Honesty flag |
 | --- | --- | --- | --- | --- |
 | C1 | Fabric IQ ontology models entities/relationships/properties + binds OneLake data without copying | `Verified-Preview` | §1 / §1a | State preview + date; note binding limits (managed tables, no OneLake security, no column mapping) |
-| C2 | Agent grounds in Fabric IQ via `fabric_iq_preview` tool (built on MCP) | `Verified-Preview` | §1b / §2a | `azure-ai-projects >= 2.2.0`; three grounding paths exist, we use path 2 |
+| C2 | Agent grounds in Fabric IQ via the **Knowledge Base `/retrieve` + inject** path (native `fabric_iq_preview` tool disqualified 2026-07-08) | `Verified-by-test` | §2b / §2a | three grounding paths exist; we use the KB retrieve+inject path (§2b), not the native tool |
 | C3 | NL2Ontology dispatches GQL (graph) / KQL (Eventhouse); graph needs tenant Graph setting | `Verified-Preview` | §1a | Manual graph refresh for new rows (G4) |
 | C4 | Weights stay frozen; optimization is text/config only | `Verified-Preview` (by construction) | §2b / §3 | Central to Art. II — no weight-update step anywhere |
 | C5 | Foundry Agent Optimizer: four targets, `eval.yaml` shape, score bands | `Gated` (preview + allow-list) | §3, §3a–§3c | **Prominent 403/allow-list flag (#10)**; `optimization_model` ∈ {gpt-5, gpt-5.1, gpt-5.3} only |
