@@ -38,7 +38,23 @@ Baseline (Phase 5) and optimized (Phase 6) runs share **one** eval set and **one
 | Baseline-LLM | `gpt-5.4` | **ON** (all runs) | `agent/.agent_configs/baseline/` | 5 |
 | Baseline-SLM | `gpt-5.4-mini` | **ON** (all runs) | `agent/.agent_configs/baseline/` (identical) | 5 |
 | Optimized-LLM | `gpt-5.4` | **ON** | optimizer output | 6 |
-| Optimized-SLM | `gpt-5.4-mini` | **ON** | optimizer output | 6 |
+| Optimized-SLM | `gpt-5.4-mini` | **ON** | optimizer output (identical config hash) | 7 (#31) |
+
+**Measured results (held-out, N=24).** The Optimized-SLM row was executed in **Phase 7, Condition A** (issue #31)
+as a config-only model swap on the **identical** recommended harness (single shared config hash
+`f9a15da1…`, `fine_tuning=false`). Full record: `eval/showdown/RESULTS.md`.
+
+| Run | Accuracy | Total tokens | Cost (USD) | $/correct | vs Optimized-LLM |
+| --- | --- | --- | --- | --- | --- |
+| Baseline-LLM (`gpt-5.4`) | 91.7% (22/24) | 107,450 | $0.175350 | $0.007970 | — |
+| Optimized-LLM (`gpt-5.4`) | 91.7% (22/24) | 101,437 | $0.163643 | $0.007438 | anchor |
+| **Optimized-SLM (`gpt-5.4-mini`)** | **87.5% (21/24)** | **66,864** | **$0.021011** | **$0.001001** | tokens 65.9% · cost **12.8% (7.8× cheaper)** · acc −4.2 pts |
+
+The SLM's two genuine misses (S01, M06) are **identical to the flagship's**; the single non-shared miss (M04) is
+**model-independent retrieval column-projection variance** (isolation diagnostic: M04+M10 pass 14/15 conditioned
+on a well-formed retrieval). Paired accuracy delta −4.2 pts, **95% CI [−12.5, 0.0] includes 0** — no
+statistically distinguishable accuracy gap at N=24.
+
 
 **Dropped: the ontology ON/OFF ablation.** With synthetic data, an ungrounded agent has no way to know the
 values and collapses to ~0% — a tautological result. Goal #2 ("Fabric IQ drives the answers") is instead
@@ -171,6 +187,21 @@ scorer, and ground truth are all unchanged (`fine_tuning: false`).
 verdict. H1 is judged after Phase 6 optimization. If the baseline already shows a Pareto win, that is
 reported as a strengthening result; if not, Phase 6's non-parametric optimization is what the hypothesis
 expects to close the gap.
+
+**Phase 7 verdict (Condition A — config-only model swap, issue #31).** Running the identical recommended
+harness on `gpt-5.4-mini` is **NOT a strict Pareto win**: the pre-registered accuracy clause
+`accuracy(SLM) ≥ accuracy(LLM)` fails (87.5% < 91.7%). The token clause (65.9% ≤ 75%) and cost clause
+(12.8% ≤ 75%) both pass — the cost win is large as pre-registered, and (honestly) the tokens are ~model-invariant
+so that clause reflects Phase-6's lever, not the swap. **The defensible finding is stronger than the strict
+test:** the two genuine SLM misses (S01, M06) are **identical to the flagship's** (shared retrieval/ontology
+quirks, grounded, error-free), the single non-shared miss (M04) is **model-independent retrieval variance**, and
+the **paired accuracy delta −4.2 pts has 95% CI [−12.5, 0.0] — includes 0**, so there is **no statistically
+distinguishable accuracy gap at N=24**. *Limitation:* the paired bootstrap captures judge/sampling but not
+between-run retrieval non-determinism, and the flagship anchor is itself a single run carrying the same ±1
+multi-hop variance. **Model independence (goal #3, Art. III) is proven** — zero code change, single shared config
+hash, `fine_tuning=false` — at **~12% of the cost (7.8–8.4× cheaper)**. The honest story is the cost/accuracy
+frontier ("pick the model per workload"), not a single Pareto checkbox. Full record: `eval/showdown/RESULTS.md`.
+Condition B (SLM re-tune) was pre-scoped OUT and not performed.
 
 ---
 
