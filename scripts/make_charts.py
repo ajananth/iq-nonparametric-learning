@@ -15,10 +15,9 @@ Usage::
     python scripts/make_charts.py --check    # fail if committed PNGs are missing/stale
 
 Outputs (docs/assets/):
-    accuracy_vs_cost.png       (a) accuracy vs total cost across the 3 runs
+    accuracy_vs_cost.png       (a) accuracy vs total cost across the 3 runs (two cost levers)
     cost_per_correct.png       (b) cost-per-correct-answer bar
     token_totals.png           (c) total tokens (Phase-6 trim + Phase-7 swap), in/out split
-    cost_accuracy_frontier.png (d) cost/accuracy frontier scatter (log cost axis)
 
 Pricing note (Art. I): ``eval/pricing.json`` is ``verified:false`` — the absolute dollar
 figures are operator-supplied placeholders. The conclusions ride the *ratio* between models,
@@ -71,7 +70,6 @@ OUTPUTS = [
     "accuracy_vs_cost.png",
     "cost_per_correct.png",
     "token_totals.png",
-    "cost_accuracy_frontier.png",
 ]
 
 
@@ -113,13 +111,9 @@ PRICING_CAVEAT = (
     "conclusions ride the ratio, not the absolute $."
 )
 
-# Per-run label offsets so the two near-equal-cost LLM points don't collide.
-LABEL_OFFSETS = {
-    "baseline": dict(xytext=(0, -34), va="top", ha="center"),
-    "optimized_llm": dict(xytext=(0, 16), va="bottom", ha="center"),
-    "optimized_slm": dict(xytext=(14, 0), va="center", ha="left"),
-}
-
+# Migrated from the removed frontier chart (issue #35): the paired-Δ CI on the
+# Phase-7 model swap. Kept so no honesty (Art. I) is lost on consolidation.
+CI_CAVEAT = "Model swap paired Δ −4.2 pts, 95% CI [−12.5, 0.0] includes 0 (N=24)."
 
 def _finish(fig, out: Path, dpi: int = 150) -> None:
     ASSETS.mkdir(parents=True, exist_ok=True)
@@ -129,25 +123,75 @@ def _finish(fig, out: Path, dpi: int = 150) -> None:
 
 
 def chart_accuracy_vs_cost(runs: list[dict]) -> None:
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
+    fig, ax = plt.subplots(figsize=(7.6, 5.0))
+    by_key = {r["key"]: r for r in runs}
+    grey = by_key["baseline"]
+    blue = by_key["optimized_llm"]
+    green = by_key["optimized_slm"]
+
+    # Scatter each run with a legend entry mapping colour -> run + model.
     for r in runs:
         ax.scatter(
-            r["cost_usd"], r["accuracy_pct"], s=170, color=r["color"],
-            edgecolors="white", linewidths=1.5, zorder=3,
+            r["cost_usd"], r["accuracy_pct"], s=180, color=r["color"],
+            edgecolors="white", linewidths=1.5, zorder=4,
+            label=f"{r['short']} · {r['model']}",
         )
-        off = LABEL_OFFSETS[r["key"]]
+
+    # Per-point %/$ labels attached with short leader lines so grey vs blue
+    # (same 91.7%, nearly-equal cost) is unambiguous.
+    leader = dict(arrowstyle="-", color="#888", lw=0.8, shrinkA=0, shrinkB=4)
+    point_labels = {
+        "baseline": dict(xytext=(30, -34), ha="left", va="top"),
+        "optimized_llm": dict(xytext=(-18, -42), ha="right", va="top"),
+        "optimized_slm": dict(xytext=(20, 10), ha="left", va="bottom"),
+    }
+    for r in runs:
+        off = point_labels[r["key"]]
         ax.annotate(
             f"{r['short']}\n{r['accuracy_pct']:.1f}%  ${r['cost_usd']:.4f}",
             (r["cost_usd"], r["accuracy_pct"]),
-            textcoords="offset points", fontsize=8.5, **off,
+            textcoords="offset points", fontsize=8.5, color="#222",
+            arrowprops=leader, **off,
         )
+
+    # Lever arrow 1 (Phase 6): grey -> blue. The two points nearly overlap, so
+    # draw a short curved connector lifted above them with its label in the
+    # empty upper-left area.
+    ax.annotate(
+        "", xy=(blue["cost_usd"], blue["accuracy_pct"] + 0.9),
+        xytext=(grey["cost_usd"], grey["accuracy_pct"] + 0.9),
+        arrowprops=dict(arrowstyle="->", color="#1f6fb4", lw=1.6,
+                        connectionstyle="arc3,rad=-0.45"), zorder=5,
+    )
+    ax.text(
+        (grey["cost_usd"] + blue["cost_usd"]) / 2 - 0.004, blue["accuracy_pct"] + 2.7,
+        "harness tuning (P6):\n−6.7% cost, same accuracy",
+        ha="center", va="bottom", fontsize=8, color="#1f6fb4",
+    )
+
+    # Lever arrow 2 (Phase 7): blue -> green. Long diagonal (big cost cut,
+    # small accuracy drop).
+    ax.annotate(
+        "", xy=(green["cost_usd"], green["accuracy_pct"]),
+        xytext=(blue["cost_usd"], blue["accuracy_pct"]),
+        arrowprops=dict(arrowstyle="->", color="#2e9e5b", lw=1.6,
+                        connectionstyle="arc3,rad=0.15"), zorder=5,
+    )
+    ax.text(
+        (blue["cost_usd"] + green["cost_usd"]) / 2, 90.6,
+        "model swap (P7):\n~8× cheaper, −4.2 pts",
+        ha="center", va="bottom", fontsize=8, color="#2e9e5b",
+    )
+
     ax.set_xlabel("Total cost over the 24-Q held-out eval (USD)")
     ax.set_ylabel("Accuracy (%)")
-    ax.set_title("Accuracy vs cost — identical harness, model is the only lever")
-    ax.set_ylim(80, 95)
+    ax.set_title("Cutting cost at near-constant accuracy: harness tuning + model swap")
+    ax.set_ylim(82, 97)
     ax.set_xlim(0, max(r["cost_usd"] for r in runs) * 1.3)
     ax.grid(True, linestyle=":", alpha=0.5)
-    fig.text(0.5, -0.02, PRICING_CAVEAT, ha="center", fontsize=7, color="#555")
+    ax.legend(loc="lower right", fontsize=8, framealpha=0.9)
+    fig.text(0.5, -0.03, CI_CAVEAT + " " + PRICING_CAVEAT,
+             ha="center", fontsize=7, color="#555")
     _finish(fig, ASSETS / "accuracy_vs_cost.png")
 
 
@@ -189,37 +233,6 @@ def chart_token_totals(runs: list[dict]) -> None:
     _finish(fig, ASSETS / "token_totals.png")
 
 
-def chart_cost_accuracy_frontier(runs: list[dict]) -> None:
-    fig, ax = plt.subplots(figsize=(7.2, 4.6))
-    for r in runs:
-        ax.scatter(
-            r["cost_usd"], r["accuracy_pct"], s=190, color=r["color"],
-            edgecolors="white", linewidths=1.5, zorder=3,
-        )
-        off = LABEL_OFFSETS[r["key"]]
-        ax.annotate(
-            f"{r['short']} ({r['model']})\n{r['correct']}/{r['n']} = {r['accuracy_pct']:.1f}%"
-            f"  ·  ${r['cost_usd']:.4f}",
-            (r["cost_usd"], r["accuracy_pct"]),
-            textcoords="offset points", fontsize=8, **off,
-        )
-    ax.set_xscale("log")
-    ax.set_xlabel("Total cost (USD, log scale) — cheaper \u2190")
-    ax.set_ylabel("Accuracy (%)")
-    ax.set_title("Cost / accuracy frontier — pick the model per workload")
-    ax.set_ylim(82, 96)
-    ax.set_xlim(runs[2]["cost_usd"] * 0.55, runs[0]["cost_usd"] * 1.9)
-    ax.grid(True, which="both", linestyle=":", alpha=0.45)
-    ax.annotate(
-        "cheaper & near-flagship", xy=(runs[2]["cost_usd"], runs[2]["accuracy_pct"]),
-        xytext=(runs[2]["cost_usd"], 83.0), fontsize=8, color="#2e9e5b", ha="center",
-    )
-    fig.text(0.5, -0.02,
-             "Paired \u0394 \u22124.2 pts, 95% CI [\u221212.5, 0.0] includes 0 (N=24). "
-             + PRICING_CAVEAT, ha="center", fontsize=7, color="#555")
-    _finish(fig, ASSETS / "cost_accuracy_frontier.png")
-
-
 def build(check: bool) -> int:
     runs = load_runs()
     cfg = showdown_config_hash()
@@ -244,7 +257,6 @@ def build(check: bool) -> int:
     chart_accuracy_vs_cost(runs)
     chart_cost_per_correct(runs)
     chart_token_totals(runs)
-    chart_cost_accuracy_frontier(runs)
     print("Done.")
     return 0
 

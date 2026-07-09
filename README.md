@@ -5,7 +5,7 @@
   Charts are generated reproducibly by scripts/make_charts.py.
 -->
 
-# Freeze the Model, Optimize the Harness — Non-Parametric Learning on the Microsoft IQ Stack
+# Optimize the Harness — Non-Parametric Learning on the Microsoft IQ Stack
 
 > ### 🔒 Status: private / preview-backed — not yet published
 > This repository backs a **forthcoming public article**. It is **private** and stays that way until an
@@ -59,8 +59,7 @@ single-hop 7/8 · multi-hop 8/10 · negative 6/6. Ratios (SLM vs optimized-LLM):
 > **ratio** between models (robust to the absolute rate, since both are priced on the same basis).
 
 <p align="center">
-  <img src="docs/assets/accuracy_vs_cost.png" alt="Accuracy vs cost across the three runs" width="48%">
-  <img src="docs/assets/cost_accuracy_frontier.png" alt="Cost/accuracy frontier scatter" width="48%">
+  <img src="docs/assets/accuracy_vs_cost.png" alt="Accuracy vs cost across the three runs — harness tuning then model swap" width="72%">
 </p>
 
 *(Charts are generated from the committed scorecards by [`scripts/make_charts.py`](./scripts/make_charts.py) —
