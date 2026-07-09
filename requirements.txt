@@ -9,7 +9,7 @@ requests>=2.31
 python-dotenv>=1.0
 
 # Phase 5 — Foundry agent harness + eval framework (issue #24, EPIC D #4).
-azure-ai-projects>=2.2.0   # FabricIQPreviewTool + PromptAgentDefinition (verified §2a)
+azure-ai-projects>=2.2.0   # hosted-agent client / PromptAgentDefinition (verified §2a)
 openai>=1.40               # Responses/Chat client returned by AIProjectClient.get_openai_client()
 duckdb>=1.0                # deterministic SQL ground truth over the synthetic CSVs
 

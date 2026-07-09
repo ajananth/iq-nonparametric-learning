@@ -25,7 +25,7 @@ in **all** runs and only the model deployment string varying (single-variable fa
 2. **tokens** — input/output per task.
 3. **cost** — `$/task` + cost-per-correct-answer (from `pricing.json`).
 4. **latency** — wall-clock ms.
-5. **grounding** — did it call `fabric_iq_preview`? multi-hop traversal-correctness.
+5. **grounding** — did it call the KB retrieve (`fabric_kb_retrieve`)? multi-hop traversal-correctness.
 6. **frozen weights** — model deployment string + config hash; `fine_tuning=false`; single shared config.
 
 ## Why SQL ground truth is trustworthy (Art. I / Art. V)

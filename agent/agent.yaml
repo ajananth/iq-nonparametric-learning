@@ -8,8 +8,9 @@
 
 name: iqnpl-water-analyst
 description: >-
-  Water-quality analyst grounded in the live Fabric IQ `iqnpl_ontology` via the fabric_iq_preview tool.
-  Baseline (un-optimized) agent for the H1 SLM-vs-LLM experiment.
+  Water-quality analyst grounded in the live Fabric IQ `iqnpl_ontology` via the Foundry IQ knowledge-base
+  retrieve+inject path (see .agent_configs/baseline/tools.json). Baseline (un-optimized) agent for the H1
+  SLM-vs-LLM experiment.
 
 # Swappable model deployment string. The ONLY variable that changes across the H1 run matrix.
 # Resolved at load time from FOUNDRY_MODEL_DEPLOYMENT_NAME; both gpt-5.4 and gpt-5.4-mini are valid.
@@ -21,9 +22,11 @@ instructions_file: .agent_configs/baseline/instructions.md   # Instruction-tunin
 tools_file: .agent_configs/baseline/tools.json               # Tool-optimization target (descriptions only)
 skills_dir: .agent_configs/baseline/skills                   # Skill-improvement target (skill bodies)
 
-# Fabric IQ grounding (values from env; see .env.example). Semantics live in the ontology, not here (Art. IV).
+# Fabric IQ grounding. The authoritative grounding spec is the knowledge-base config the harness actually
+# loads at runtime: .agent_configs/baseline/tools.json (type: fabric_iq_knowledge_base, AZURE_SEARCH_* env,
+# retrieve_params.rerankerThreshold: 0). The harness POSTs /knowledgebases/{kb}/retrieve and injects the
+# returned verbatim ontology rows before the agent answers (docs/verified-capabilities.md §2b). Semantics
+# live in the ontology, not here (Art. IV). The native fabric_iq_preview tool path was disqualified
+# 2026-07-08 (hosted-MCP chunker -> 0 rows -> hallucination; §2a).
 grounding:
-  tool: fabric_iq_preview
-  project_connection_id: ${FABRIC_IQ_PROJECT_CONNECTION_ID}
-  server_url: https://api.fabric.microsoft.com/v1/mcp/dataPlane/workspaces/${FABRIC_WORKSPACE_ID}/items/${FABRIC_ONTOLOGY_ITEM_ID}/ontologyEndpoint
-  require_approval: never
+  config_ref: .agent_configs/baseline/tools.json
