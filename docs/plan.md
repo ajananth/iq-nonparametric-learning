@@ -104,7 +104,7 @@ Delivered as `docs/verified-capabilities.md` (dated 2026-07-03) via PR #9 (merge
 
 ### Phase 1 — Article outline & narrative spine — DONE ✅
 Delivered as `docs/article-outline.md` via PR #14 (merged), issue #13. EPIC B (#2) complete.
-- Working title: *Freeze the Model, Optimize the Harness: Non-Parametric Learning on the Microsoft IQ Stack*.
+- Working title (final title, merged in #35): *Optimize the Harness — Non-Parametric Learning on the Microsoft IQ Stack*.
 - Thesis/hook, target audience, 10-section outline, two dedicated headline-narrative sections, a C1–C9
   accuracy register tied to verified-capabilities.md, and honest gate/placeholder flags.
 - Publication recommendation: **Microsoft Tech Community** (primary) + **dev.to** cross-post (canonical
