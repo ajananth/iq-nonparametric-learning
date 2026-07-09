@@ -175,10 +175,10 @@ def chart_accuracy_vs_cost(runs: list[dict]) -> None:
         "", xy=(green["cost_usd"], green["accuracy_pct"]),
         xytext=(blue["cost_usd"], blue["accuracy_pct"]),
         arrowprops=dict(arrowstyle="->", color="#2e9e5b", lw=1.6,
-                        connectionstyle="arc3,rad=0.15"), zorder=5,
+                        connectionstyle="arc3,rad=0.10"), zorder=5,
     )
     ax.text(
-        (blue["cost_usd"] + green["cost_usd"]) / 2, 90.6,
+        0.072, 92.5,
         "model swap (P7):\n~8× cheaper, −4.2 pts",
         ha="center", va="bottom", fontsize=8, color="#2e9e5b",
     )
