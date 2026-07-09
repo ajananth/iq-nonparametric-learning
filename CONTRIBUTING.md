@@ -39,3 +39,8 @@ direct pushes to `main` are not allowed.
   committed.
 - **Public safety (Art. VII/VIII):** nothing is made public without explicit approval; the repo stays
   **private** until the publication gate.
+
+## License
+
+Per Constitution Art. VII.3: **code is MIT** (see [`LICENSE`](./LICENSE)); **prose / documentation /
+article content is CC-BY**. By contributing you agree your contributions are licensed on the same terms.
