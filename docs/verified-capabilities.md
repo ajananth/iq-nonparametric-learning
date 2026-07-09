@@ -126,7 +126,7 @@ There are **three documented, complementary paths**, and the flagship one is *na
 
 ### 1d. LIVE deployment findings — Phase 4 (#22, EPIC C #3), verified-by-test **2026-07-06**
 
-A full live deploy was executed against workspace **`iq-npl`** (`a9dc85a5-fe8a-4ceb-9d5e-d93064c3f124`,
+A full live deploy was executed against workspace **`iq-npl`** (`<workspace-id>`,
 F64 / F-SKU, Australia East). These are **empirical, verified-by-test** results — they refine the Phase 0
 doc-only claims above where live behaviour diverged. Reproducible via `scripts/` (see `docs/phase4-deployment.md`).
 
