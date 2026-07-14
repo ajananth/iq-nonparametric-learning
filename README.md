@@ -7,10 +7,9 @@
 
 # Optimize the Harness — Non-Parametric Learning on the Microsoft IQ Stack
 
-> ### 🔒 Status: private / preview-backed — not yet published
-> This repository backs a **forthcoming public article**. It is **private** and stays that way until an
-> explicit publication approval gate ([`CONSTITUTION.md`](./CONSTITUTION.md) Art. VIII). Every capability
-> below is marked **preview/GA + date** and cites [`docs/verified-capabilities.md`](./docs/verified-capabilities.md)
+> ### 📖 Companion repository for the article — reproducible end-to-end
+> This repository backs the public article and reproduces every result end-to-end. Each capability below is
+> marked **preview/GA + date** and cites [`docs/verified-capabilities.md`](./docs/verified-capabilities.md)
 > (Phase-0 feasibility gate, verified **2026-07-03**; live-verified in Phase 4–5, **2026-07-06 / 2026-07-08**).
 > Microsoft Fabric IQ and the Foundry Agent Optimizer are **preview** features (no SLA; subject to change).
 
