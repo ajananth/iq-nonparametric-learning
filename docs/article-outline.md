@@ -132,9 +132,9 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 #### S5.5 — HEADLINE #1: The Fabric IQ ↔ Foundry semantic contract *(dedicated — see §4a)*
 
 ### S6. The Foundry agent harness
-- Define the hosted agent: **model deployment (by name) + `instructions.md` + tools** — grounded via the
+- Define the Foundry agent: **model deployment (by name) + `instructions.md` + tools** — grounded via the
   Fabric IQ **Knowledge Base `/retrieve` + inject** path (the harness POSTs `/knowledgebases/{kb}/retrieve`
-  and injects verbatim ontology rows; `azure-ai-projects >= 2.2.0` for the hosted-agent client). *(§2b.)*
+  and injects verbatim ontology rows; `azure-ai-projects >= 2.2.0` for the Foundry agent client). *(§2b.)*
 - Auth model stated accurately: **delegated user identity** (requests run in the signed-in user's context,
   honoring Fabric permissions) + BYO Entra app via managed OAuth; RBAC **Foundry User** + **Foundry Project
   Manager**. *(verified-capabilities §1c, §2a.)*
@@ -195,7 +195,7 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
 - **Claims-to-verify:** all clauses map to verified-capabilities §1/§2; preview status + date stated.
 
 ### 4b. HEADLINE #2 — Frontier model swappability / model independence (article §S9)
-- **Claim:** swap the model via **config, not code** — a hosted agent references a **model deployment by
+- **Claim:** swap the model via **config, not code** — a Foundry agent references a **model deployment by
   name**, so swapping is a config/deployment change. *(Art. III; verified-capabilities §2b.)*
 - **The experiment:** use the optimizer's **model-selection** target
   (`options.optimization_config.model` list) to score the agent across deployments (e.g. a flagship vs a

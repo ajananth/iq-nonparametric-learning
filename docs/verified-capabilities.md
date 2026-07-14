@@ -169,7 +169,7 @@ doc-only claims above where live behaviour diverged. Reproducible via `scripts/`
 
 ## 2. Foundry Agent Service — grounding an agent in Fabric IQ & frozen weights
 
-**Status: `Verified-Preview`** (Fabric IQ grounding is preview; hosted agents are a Foundry Agent Service capability)
+**Status: `Verified-Preview`** (Fabric IQ grounding is preview; agents are a Foundry Agent Service capability)
 
 **Primary sources (accessed 2026-07-03; §2a–2c re-verified 2026-07-08):**
 - Connect agents to Microsoft Fabric with Fabric IQ (preview) — https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/fabric-iq *(updated 2026-07-01)*
@@ -177,7 +177,7 @@ doc-only claims above where live behaviour diverged. Reproducible via `scripts/`
 - Create a Knowledge Base (agentic retrieval) — https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-create-knowledge-base *(2026-05-01-preview)*
 - Query a Knowledge Base via API or MCP (retrieve) — https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-retrieve *(2026-05-01-preview)*
 
-### 2a. Attaching the Fabric IQ tool/connection to a hosted agent — Verified
+### 2a. Attaching the Fabric IQ tool/connection to a Foundry agent — Verified
 - **Tool type: `fabric_iq_preview`** (Python/JS/.NET SDK class `FabricIQPreviewTool`). Requires
   `azure-ai-projects >= 2.2.0`. SDK/interface support: Python ✔, C# ✔, JavaScript ✔, REST ✔ (Java —); works with
   Basic and Standard agent setup.
@@ -249,7 +249,7 @@ verbatim ontology rows** (unlike the tool paths in §2a). Two consumption modes,
   experimental controls H1 requires. *(Phase 5, PR #25, 2026-07-08)*
 
 ### 2d. Keeping model weights frozen (config) — Verified by construction (supports Art. II & III)
-- A hosted agent references a **model *deployment* by name** (a config string), not trainable weights. Swapping
+- A Foundry agent references a **model *deployment* by name** (a config string), not trainable weights. Swapping
   the model is a config/deployment change — **no code rewrite** (Art. III swappability).
 - The optimization path (§3) changes **only text/config** — instructions, skills, tool descriptions, and **model
   *selection*** — and **never** fine-tunes or updates weights. There is no weight-update step anywhere in the

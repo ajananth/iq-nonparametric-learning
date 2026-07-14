@@ -1,7 +1,7 @@
 # Agent instructions — baseline (water-analyst persona)
 
 <!--
-Phase 5 (issue #24, EPIC D #4). System prompt for the hosted Foundry agent and the Instruction-tuning
+Phase 5 (issue #24, EPIC D #4). System prompt for the Foundry agent and the Instruction-tuning
 target for the Agent Optimizer (docs/verified-capabilities.md §3b). Governance:
 - Art. II: model weights are frozen; this text is the only thing tuned. No fine-tuning.
 - Art. III: model-agnostic — NO model names, temperatures, or provider-specific phrasing here.

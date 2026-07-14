@@ -147,7 +147,7 @@ while the optimizer allow-list request (#10) and Azure/Fabric provisioning happe
 
 ### Phase 5 — Foundry agent harness
 - Entra app registration + permissions.
-- Hosted agent config: instructions.md (persona), tools.json (Fabric IQ tool), model = GPT-5.4.
+- Foundry agent config: instructions.md (persona), tools.json (Fabric IQ tool), model = GPT-5.4.
 - Baseline invoke sanity test.
 
 ### Phase 6 — Non-parametric optimization loop

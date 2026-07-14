@@ -2,7 +2,7 @@
 
 > **Issue:** #24 (EPIC D, #4) · **Phase:** 5 (harness + eval + baseline)
 
-**Intent.** The **non-parametric, text-space** configuration and invocation harness for the hosted Microsoft
+**Intent.** The **non-parametric, text-space** configuration and invocation harness for the Microsoft
 Foundry agent, grounded in the **live** Fabric IQ `iqnpl_ontology` via the **Foundry IQ Knowledge Base**
 (`fabricOntology`) **manual `/retrieve` + inject** path — the experiment surface that produced every committed
 scorecard (`docs/verified-capabilities.md` §2b, Verified-by-test 2026-07-08). The native `fabric_iq_preview`
@@ -14,7 +14,7 @@ is the recommended **production** pattern (§2c). The model is a **swappable dep
 
 ```
 agent/
-  agent.yaml               # hosted-agent manifest (model = ${FOUNDRY_MODEL_DEPLOYMENT_NAME}, swappable)
+  agent.yaml               # Foundry agent manifest (model = ${FOUNDRY_MODEL_DEPLOYMENT_NAME}, swappable)
   harness.py               # load_config() + create/invoke/delete a Foundry agent version; captures metrics
   .agent_configs/
     baseline/

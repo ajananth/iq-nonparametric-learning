@@ -1,6 +1,6 @@
 # `infra/` — Infrastructure & provisioning (Phase 5+)
 
-**Intent.** This directory will hold infrastructure-as-code and provisioning notes for the hosted Foundry
+**Intent.** This directory will hold infrastructure-as-code and provisioning notes for the Foundry
 agent and its Fabric IQ connection. In the verified `azd ai agent init` layout, `azd` generates `infra/`
 (and `azure.yaml`) alongside the agent config; those artifacts will live here.
 
@@ -13,7 +13,7 @@ agent and its Fabric IQ connection. In the verified `azd ai agent init` layout, 
 1. `azd ai agent init` — scaffold the agent (`agent.yaml`, `.agent_configs/baseline/`, dataset, and IaC into
    `infra/` + `azure.yaml`).
 2. `azd provision` → `azd deploy` (or `azd up`) — provision and deploy.
-3. `azd ai agent invoke "<prompt>"` — smoke-test the hosted agent.
+3. `azd ai agent invoke "<prompt>"` — smoke-test the Foundry agent.
 
 ## Prerequisites (see `PREREQUISITES.md`)
 - Paid **F2+** Fabric capacity + workspace with the ontology tenant settings enabled.

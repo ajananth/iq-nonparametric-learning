@@ -112,7 +112,7 @@ Enterprise context lives in two Microsoft layers:
 **Non-parametric learning here means the model's weights never change.** All optimization happens in **text
 space** — instructions, tool/parameter descriptions, skills, retrieval knobs, and **model selection**. Why it
 matters: it is fast, auditable, reversible, immune to catastrophic forgetting, and it keeps the model
-swappable. A hosted agent references a **model deployment string**, not trainable weights, so
+swappable. A Foundry agent references a **model deployment string**, not trainable weights, so
 `fine_tuning=false` is true **by construction**. *(verified-capabilities §2d — Verified; Constitution Art. II.)*
 
 Two optimization engines are relevant. The native **Foundry Agent Optimizer** (`azd` extension
@@ -166,7 +166,7 @@ flowchart LR
   end
   subgraph Foundry["Azure AI Foundry"]
     KB["Foundry IQ Knowledge Base<br/>(fabricOntology, agentic retrieval)"]
-    A["Hosted agent<br/>model deployment = config string"]
+    A["Foundry agent<br/>model deployment = config string"]
   end
   Q(["User question<br/>(cross-domain)"]) --> A
   T -- "bind (no copy)" --> O
@@ -254,7 +254,7 @@ run) and the **Phase-7 model swap** (→ 66,864). Cost-per-correct falls from **
 
 ## ★ Headline #2 — frontier model swappability
 
-Because the ontology owns the schema, **swapping the model is a config change, not code** — a hosted agent
+Because the ontology owns the schema, **swapping the model is a config change, not code** — a Foundry agent
 references a **deployment by name** (Art. III; verified-capabilities §2d). Phase 7 proves it: we ran the
 **exact** Phase-6 recommended harness, **unchanged**, on `gpt-5.4-mini`. The **only** variable that moved was
 the deployment string (agent **and** knowledge-base synthesis both `gpt-5.4-mini`; single shared config hash;

@@ -49,12 +49,12 @@ require a **manual graph refresh**. *(verified-capabilities.md §1a; risk G3/G4)
 
 ## 2. Azure AI Foundry — project & model deployment
 
-**Status:** `Verified-Preview` (Fabric IQ grounding is preview; hosted agents are a Foundry Agent Service capability).
+**Status:** `Verified-Preview` (Fabric IQ grounding is preview; agents are a Foundry Agent Service capability).
 **Source:** `docs/verified-capabilities.md` §2, §1c.
 
 - An existing **Foundry project/instance**.
 - **At least one model deployment** (a **GPT-5 family** chat-completion deployment — the demo baseline in the
-  plan is GPT-5.4). A hosted agent references a **model *deployment* by name** (a config string), so the model
+  plan is GPT-5.4). A Foundry agent references a **model *deployment* by name** (a config string), so the model
   stays a swappable commodity (Art. III) and weights stay frozen (Art. II). *(verified-capabilities.md §2b)*
 - **Azure RBAC (Foundry project + Fabric IQ knowledge-base grounding):**
   - **Foundry User** on the project — for the developer identity, the agent runtime identity, and any user
