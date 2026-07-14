@@ -324,8 +324,4 @@ and dated (Art. I); model weights are **never** altered — optimization is text
 model-specific hardcoding (Art. III); synthetic fixtures only, real data via config (Art. V); no secrets in
 the repo (Art. VI); every change is backed by an **Epic → Issue → PR**, merged via review (Art. XIII); publication happened only after explicit approval (Art. VIII).
 
-**Preview status.** Microsoft Fabric IQ and the Foundry Agent Optimizer are **preview** features (no SLA;
-subject to change); every capability above is marked **preview/GA + date** against
-[`docs/verified-capabilities.md`](./docs/verified-capabilities.md).
-
 **License.** Code: **MIT** (see [`LICENSE`](./LICENSE)). Prose / article content: **CC-BY** (Art. VII.3).
