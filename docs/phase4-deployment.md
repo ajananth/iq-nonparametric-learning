@@ -14,10 +14,10 @@ validation query and its result. Empirical capability findings are folded into
 
 | Item | Value |
 | --- | --- |
-| Tenant | `80507321-78f6-4035-a8ef-9d7e1680a652` |
+| Tenant | `<tenant-id>` |
 | Workspace (display name) | `iq-npl` |
-| Workspace GUID | `a9dc85a5-fe8a-4ceb-9d5e-d93064c3f124` |
-| Capacity | `3dc897d5-f720-4dd8-b5f2-563bc8782d60` — **F64 (F-SKU)**, Active, Australia East |
+| Workspace GUID | `<workspace-id>` |
+| Capacity | `<capacity-id>` — **F64 (F-SKU)**, Active, Australia East |
 | Tenant setting | **Enable Ontology item (preview)** = ON (only setting required — see §1d) |
 | Auth | `az login` → `DefaultAzureCredential` (delegated user identity; no secrets stored) |
 
@@ -25,10 +25,10 @@ validation query and its result. Empirical capability findings are folded into
 
 | Resource | Display name | GUID |
 | --- | --- | --- |
-| Lakehouse (data) | `iqnpl_lakehouse` | `9abdb8ce-7b60-4966-90bc-aab6c32fe4bb` |
-| Ontology (preview) | `iqnpl_ontology` | `8dd31e82-8dd0-44b0-b0fb-d70457b9b4da` |
-| GraphModel (companion, auto-created) | `iqnpl_ontology_graph_…` | `300e63d8-9957-419d-8746-e3c0dc56e07e` |
-| Lakehouse (companion, auto-created) | `iqnpl_ontology_lh_…` | `342f74e1-5c07-4ce4-bae9-5017b93816f7` |
+| Lakehouse (data) | `iqnpl_lakehouse` | `<lakehouse-id>` |
+| Ontology (preview) | `iqnpl_ontology` | `<ontology-item-id>` |
+| GraphModel (companion, auto-created) | `iqnpl_ontology_graph_…` | `<graph-item-id>` |
+| Lakehouse (companion, auto-created) | `iqnpl_ontology_lh_…` | `<companion-lakehouse-id>` |
 
 ## Loaded managed Delta tables (in `iqnpl_lakehouse`)
 
@@ -58,7 +58,7 @@ az login
 az account set --subscription <sub>   # if needed
 
 # 1. Create Lakehouse + flat-load the 4 CSVs as managed Delta tables
-python scripts/load_lakehouse.py --workspace-id a9dc85a5-fe8a-4ceb-9d5e-d93064c3f124
+python scripts/load_lakehouse.py --workspace-id <workspace-id>
 #   -> capture the printed lakehouse GUID as FABRIC_LAKEHOUSE_ID
 
 # 2. Create the ontology (preview) item

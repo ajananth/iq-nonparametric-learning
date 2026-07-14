@@ -107,11 +107,11 @@ the throttled first run is archived as supporting evidence.
 ## Infra note — capacity bump (NOT an experiment variable)
 
 The first run's M10 failure was a **hard Azure throttle**: the `gpt-5.4-mini` deployment had
-`sku.capacity=10` vs the flagship `gpt-5.4` at `150` (account `tchack-resource`, RG `rg-ai`, eastus2). This was
+`sku.capacity=10` vs the flagship `gpt-5.4` at `150` (account `<foundry-account>`, RG `<resource-group>`, eastus2). This was
 raised to match the flagship:
 
 ```
-az cognitiveservices account deployment create -n tchack-resource -g rg-ai \
+az cognitiveservices account deployment create -n <foundry-account> -g <resource-group> \
   --deployment-name gpt-5.4-mini --model-name gpt-5.4-mini --model-version 2026-03-17 \
   --model-format OpenAI --sku-name GlobalStandard --sku-capacity 150
 # verified: {"name":"gpt-5.4-mini","cap":150,"ver":"2026-03-17"}
