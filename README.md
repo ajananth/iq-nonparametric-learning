@@ -7,12 +7,6 @@
 
 # Optimize the Harness — Non-Parametric Learning on the Microsoft IQ Stack
 
-> ### 📖 Companion repository for the article — reproducible end-to-end
-> This repository backs the public article and reproduces every result end-to-end. Each capability below is
-> marked **preview/GA + date** and cites [`docs/verified-capabilities.md`](./docs/verified-capabilities.md)
-> (Phase-0 feasibility gate, verified **2026-07-03**; live-verified in Phase 4–5, **2026-07-06 / 2026-07-08**).
-> Microsoft Fabric IQ and the Foundry Agent Optimizer are **preview** features (no SLA; subject to change).
-
 **Thesis.** Put the *truth* of your enterprise data — its schema, vocabulary, and join logic — in a
 **semantic layer** (Fabric IQ), treat the model as a **swappable commodity behind config**, and improve the
 agent by optimizing **text** (instructions, tools, retrieval, model selection) — **never** by touching model
@@ -309,9 +303,6 @@ ontology/KB → run baseline/optimizer/scorer → reproduce the scorecards. Ever
 fixtures**; wire your **own** data/ontology via config. Regenerate the charts with
 `python scripts/make_charts.py`.
 
-> **Publication gate (Art. VIII).** The repo and article go **public only** at an explicit approval gate. This
-> README is the canonical article; there are no external cross-posts.
-
 ---
 
 ## Governance, reproduction & license
@@ -331,7 +322,10 @@ narrative; the spokes carry the depth:
 **Governance hard rules (Constitution):** all technical claims are verified against primary Microsoft sources
 and dated (Art. I); model weights are **never** altered — optimization is text-space only (Art. II); no
 model-specific hardcoding (Art. III); synthetic fixtures only, real data via config (Art. V); no secrets in
-the repo (Art. VI); every change is backed by an **Epic → Issue → PR**, merged via review (Art. XIII); nothing
-is made public without explicit approval (Art. VIII).
+the repo (Art. VI); every change is backed by an **Epic → Issue → PR**, merged via review (Art. XIII); publication happened only after explicit approval (Art. VIII).
+
+**Preview status.** Microsoft Fabric IQ and the Foundry Agent Optimizer are **preview** features (no SLA;
+subject to change); every capability above is marked **preview/GA + date** against
+[`docs/verified-capabilities.md`](./docs/verified-capabilities.md).
 
 **License.** Code: **MIT** (see [`LICENSE`](./LICENSE)). Prose / article content: **CC-BY** (Art. VII.3).
