@@ -214,8 +214,9 @@ Consistent with `docs/experiment-protocol.md` §6.
 # 1. Regenerate the deterministic ground truth (offline; no Azure, no cost).
 python eval/ground_truth.py
 
-# 2. Score the cross-vendor model (LIVE; requires the Fabric IQ connection + explicit cost approval, §6).
-python eval/scorer.py --model kimi-k2.6 --confirm-cost
+# 2. Score the cross-vendor model (LIVE; requires the Fabric IQ connection + prior human cost approval, §6).
+#    scorer.py has no cost flag — the §6 STOP-gate is procedural / enforced at the run_baseline level.
+python eval/scorer.py --model kimi-k2.6
 
 # 3. Cross-vendor comparison vs the gpt-5.4 anchor (LIVE; cost-gated).
 python eval/run_baseline.py --models gpt-5.4 kimi-k2.6 --confirm-cost
