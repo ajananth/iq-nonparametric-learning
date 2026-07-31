@@ -312,10 +312,6 @@ The Phase-7 swap moved between two **OpenAI** models. EPIC H asks the harder que
 
 Because per-query cost is volume-invariant, the modest per-query gap compounds at enterprise scale: **~6.9% cheaper per query** (~2.5% per correct answer) ≈ **$473 saved per 1M queries** on this workload's token profile, at placeholder rates (`eval/pricing.json` `verified:false`).
 
-Because per-query cost is volume-invariant, the modest per-query gap compounds at enterprise scale: **~6.9%
-cheaper per query** (~2.5% per correct answer) ≈ **$473 saved per 1M queries** on this workload's token
-profile, at placeholder rates (`eval/pricing.json` `verified:false`).
-
 <p align="center">
   <img src="docs/assets/xvendor_accuracy_vs_cost.png" alt="Cross-vendor accuracy vs USD cost — Kimi-K2.6 vs the gpt-5.4 anchor" width="72%">
 </p>
