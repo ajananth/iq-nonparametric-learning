@@ -9,8 +9,7 @@
 
 **Thesis.** Put the *truth* of your enterprise data — its schema, vocabulary, and join logic — in a
 **semantic layer** (Fabric IQ), treat the model as a **swappable commodity behind config**, and improve the
-agent by optimizing **text** (instructions, tools, retrieval, model selection) — **never** by touching model
-weights. This repo proves it end-to-end on a water-utility algal-bloom scenario, with an auditable trail and
+agent by optimizing **text** (instructions, tools, retrieval, model selection). This repo proves it end-to-end on a water-utility algal-bloom scenario, with an auditable trail and
 **real, reproduced numbers**.
 
 ---
@@ -72,7 +71,7 @@ single-hop 7/8 · multi-hop 8/10 · negative 6/6. Ratios (SLM vs optimized-LLM):
 - [S3. Non-parametric learning — optimize the harness, freeze the weights](#s3-non-parametric-learning)
 - [S4. The scenario — a water utility responding to an algal bloom](#s4-the-scenario)
 - [S5. Building the semantic layer in Fabric IQ](#s5-building-the-semantic-layer) · [architecture diagram](#architecture-diagram)
-- [★ Headline #1 — the Fabric IQ ↔ Foundry semantic contract](#-headline-1--the-fabric-iq--foundry-semantic-contract)
+- [★ Headline #1 — model-independent grounded truth (the semantic contract)](#-headline-1--model-independent-grounded-truth-the-semantic-contract)
 - [S6. The Foundry agent harness](#s6-the-foundry-agent-harness)
 - [S7. The non-parametric optimization loop](#s7-the-non-parametric-optimization-loop) · [loop diagram](#optimization-loop-diagram)
 - [S8. Results — auditable diffs and charts](#s8-results--auditable-diffs-and-charts)
@@ -176,7 +175,7 @@ flowchart LR
   A --> ANS(["Grounded answer<br/>or safe refusal"])
 ```
 
-## ★ Headline #1 — the Fabric IQ ↔ Foundry semantic contract
+## ★ Headline #1 — model-independent grounded truth (the semantic contract)
 
 The ontology is the **agreed interface** between the data platform and the agent — a *contract*. Because
 data structure and vocabulary live in the ontology (not prompts), the agent answers a **single** question
