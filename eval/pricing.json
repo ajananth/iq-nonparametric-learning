@@ -6,7 +6,8 @@
   "source": "placeholder - replace with your Foundry/AOAI pricing",
   "models": {
     "gpt-5.4": {"input": 1.25, "output": 10.0},
-    "gpt-5.4-mini": {"input": 0.25, "output": 2.0}
+    "gpt-5.4-mini": {"input": 0.25, "output": 2.0},
+    "kimi-k2.6": {"input": 0.95, "output": 4.0, "cached_input": 0.16, "_source": "docs/verified-capabilities.md §5b — Azure Retail Prices API (public, no auth), eastus2 GlobalStandard 'glbl' meters (K2.6 Thinking Inp/Outp, K2.6 cached), effective 2026-05-01. Same GlobalStandard SKU family as gpt-5.4, so USD is like-for-like. Operator-supplied per Art. I; scorer uses input/output only, cached_input informational."}
   },
   "default": {"input": 1.0, "output": 5.0}
 }
