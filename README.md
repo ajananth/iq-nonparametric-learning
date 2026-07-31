@@ -33,7 +33,12 @@ weights. This repo proves it end-to-end on a water-utility algal-bloom scenario,
    the flagship within statistical noise** (paired Δ **−4.2 pts, 95% CI [−12.5, 0.0] — includes 0** at N=24;
    its two genuine misses are **shared and identical** with the flagship) at **~12% of the cost (~8× cheaper)**.
    It is **not** a strict Pareto win — **87.5% < 91.7%**, stated plainly. The honest **cost/accuracy frontier**
-   is the story. *(Phase 7; [`eval/showdown/RESULTS.md`](./eval/showdown/RESULTS.md).)*
+   is the story. *(Phase 7; [`eval/showdown/RESULTS.md`](./eval/showdown/RESULTS.md).)* And it holds **across the
+   vendor boundary too:** the **identical** harness with the reasoning/answer model swapped (config string only)
+   to the **open-weights, non-GPT `Kimi-K2.6`** reaches **parity within noise** (paired Δ **−4.2 pts, 95% CI
+   [−12.5, 0.0] — includes 0** at N=24) while being **cheaper in USD on every axis** on the same GlobalStandard
+   SKU — Headline #2 leveling up from within-GPT-family to cross-vendor.
+   *(EPIC H; [`eval/showdown_xvendor/RESULTS.md`](./eval/showdown_xvendor/RESULTS.md).)*
 
 ### Headline results (verbatim from the committed scorecards)
 
@@ -261,9 +266,14 @@ flowchart LR
   H["One harness<br/>identical config hash f9a15da1…<br/>(zero code change)"]
   H --> M1["gpt-5.4 (flagship)<br/>91.7% · $0.163643"]
   H --> M2["gpt-5.4-mini (SLM)<br/>87.5% · $0.021011 · ~8× cheaper"]
+  H --> M3["Kimi-K2.6 (open-weights, non-GPT)<br/>87.5% · $0.152285 · parity within noise · cheaper USD"]
   M1 --> F["Cost / accuracy frontier<br/>pick the model per workload"]
   M2 --> F
+  M3 --> F
 ```
+
+_The same config-string swap that moves gpt-5.4 → gpt-5.4-mini within the OpenAI family also crosses the
+**vendor boundary** to the open-weights, non-GPT Kimi-K2.6 — one harness, one config hash, three models._
 
 **The honest reading (`eval/showdown/RESULTS.md`):** this is **not a strict Pareto win** — **87.5% < 91.7%**,
 the pre-registered `accuracy(SLM) ≥ accuracy(LLM)` clause fails, stated plainly. But the defensible finding is
@@ -286,6 +296,48 @@ stronger than the strict test: the SLM **matches the flagship within noise**:
 **So:** pick the model per workload — the flagship for extra multi-hop robustness, the SLM when cost dominates
 and near-flagship accuracy suffices. That **cost/accuracy frontier**, not a single Pareto checkbox, is the
 honest story.
+
+### Cross-vendor extension — the same harness on Kimi-K2.6
+
+The Phase-7 swap moved between two **OpenAI** models. EPIC H asks the harder question: does the independence
+hold **across vendors**? We ran the **identical, unmodified** tuned harness — same `f9a15da1…` config hash,
+`fine_tuning=false` — with the **reasoning/answer model** (the "brain" that reads the grounded rows, resolves
+the multi-hop question, and writes the answer) swapped to the **open-weights, non-GPT `Kimi-K2.6`** (Moonshot
+AI, GlobalStandard SKU). The **only** variable moved vs the `gpt-5.4` anchor is the reasoning-model deployment
+string `gpt-5.4 → kimi-k2.6`. *(EPIC H; [`eval/showdown_xvendor/RESULTS.md`](./eval/showdown_xvendor/RESULTS.md),
+pre-registered in [`docs/cross-vendor-protocol.md`](./docs/cross-vendor-protocol.md).)*
+
+- **Accuracy — parity within noise (the pre-registered success condition):** Kimi-K2.6 **87.5% (21/24)** vs
+  the `gpt-5.4` anchor **91.7% (22/24)**; paired bootstrap delta **−4.2 pts, 95% CI [−12.5, 0.0] — includes 0**
+  (10,000 resamples, N=24). The CI including 0 means the two are **statistically indistinguishable on this
+  held-out set** — a within-noise result, which is the success for cross-vendor model independence (not a claim
+  that Kimi is better; it is not).
+- **Cost — cheaper in USD on every axis:** both models are on the **same GlobalStandard SKU**, so dollars are
+  directly comparable (no deployment-basis caveat). Kimi-K2.6 vs the `gpt-5.4` anchor: **total $0.152285 vs
+  $0.163643**, **$/query $0.006345 vs $0.006818**, **$/correct $0.007252 vs $0.007438** — lower on all three
+  (Kimi GlobalStandard rates $0.95/M in · $4.00/M out · $0.16/M cached, verified-capabilities §5b).
+  *Token counts are per-model informational only — Kimi and GPT use different tokenizers, so a token is not a
+  like-for-like unit; the comparable cross-model axis is USD.*
+- **Grounding & refusals preserved:** groundedness **100%** (the harness-enforced KB retrieve fires on every
+  task, so grounding never depends on the model's parametric knowledge) and safe refusals **6/6** on the
+  negatives — carried across the vendor boundary unchanged.
+- **Single-variable control:** a **single shared config hash `f9a15da1…`** across all 24 tasks, and it **equals
+  the enshrined Phase-7 hash** — the auditable proof that only the model moved.
+- **The three misses are model-independent:** S01 and M06 are the enshrined misses the flagship **also** gets
+  wrong (zero model-attributable gap); M10 is the documented retrieval column-projection / set-completeness
+  variance that would break the flagship identically. **Honest limitation (from `RESULTS.md`):** N=24, and the
+  `gpt-5.4` anchor is itself a single stochastic run carrying the same ±1 multi-hop retrieval variance — the
+  gap is not a fixed model property.
+- **On KB answer-synthesis (stated factually, not a limitation):** the Azure AI Search Knowledge Base
+  `answerSynthesis` step is a **GPT-family-only** surface by platform design (an enforced allow-list;
+  verified-capabilities §5c), so it stays on `gpt-5.4` here. That is a fixed property of the **retrieval /
+  grounding** path, held byte-identical across every model in the study — it is **not** the reasoning agent.
+  The cross-vendor claim rides on the model doing the reasoning and emitting the answer, which **is** Kimi-K2.6.
+
+**The reading:** Headline #2 levels up from within-GPT-family to **cross-vendor** — an open-weights model that
+shares no lineage, tokenizer, or training pipeline with GPT reaches the **same answers** on the **same grounded
+harness** with a **config-string-only swap**, for **less money**. That is the non-parametric-learning thesis
+holding past the vendor boundary.
 
 ## S10. Takeaways & how to run it
 
