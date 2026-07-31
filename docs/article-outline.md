@@ -209,6 +209,22 @@ auditable engineering discipline — via the **Foundry Agent Optimizer** where a
   (`eval/showdown/RESULTS.md`); (c) supported `optimization_model` values — see verified-capabilities §3c
   (the earlier narrow list is superseded; the article does not enumerate it).
 - **Claims-to-verify:** verified-capabilities §2b, §3b, §3c; results are Phase-7 outputs, not yet real.
+- **Cross-vendor extension (EPIC H, model independence past the vendor boundary):** the same config-string-only
+  swap that moves `gpt-5.4` → `gpt-5.4-mini` **within** the OpenAI family also crosses the **vendor boundary** to
+  the **open-weights, non-GPT `Kimi-K2.6`** (Moonshot AI, GlobalStandard SKU) as the reasoning/answer model on
+  the **identical, unmodified** harness. Measured result (`eval/showdown_xvendor/RESULTS.md`): **87.5% (21/24)**
+  vs the `gpt-5.4` anchor **91.7% (22/24)**, **parity within noise** (paired Δ **−4.2 pts, 95% CI [−12.5, 0.0] —
+  includes 0**, N=24), while **cheaper in USD on every axis** on the same GlobalStandard SKU ($/query $0.006345
+  vs $0.006818; $/correct $0.007252 vs $0.007438); groundedness 100%, refusals 6/6; single shared config hash
+  `f9a15da1…` = enshrined Phase-7 (only variable = the reasoning-model string). **Honesty guardrails:** state
+  "parity within noise" / "statistically indistinguishable on this held-out set" — **never** "beats"/"proves";
+  cost is a **USD-only** claim (Kimi and GPT use different tokenizers, so token counts are per-model
+  informational only); **no** deployment-basis caveat (all GlobalStandard); note N=24 and that the anchor is
+  itself a single run with retrieval variance. KB `answerSynthesis` staying on `gpt-5.4` is stated **factually
+  as configuration** (a GPT-family-only platform surface, verified-capabilities §5c), **not** a limitation — the
+  reasoning/answer model is Kimi-K2.6. Pre-registered in `docs/cross-vendor-protocol.md`.
+- **Claims-to-verify:** `eval/showdown_xvendor/RESULTS.md`; verified-capabilities §5 (§5a catalog, §5b
+  GlobalStandard pricing, §5c KB synthesis allow-list); `docs/cross-vendor-protocol.md` §5 success criteria.
 
 ---
 
@@ -228,6 +244,7 @@ Every technical assertion in the finished article must carry an inline citation 
 | C7 | Model swappability = config-only deployment swap + model-selection sweep | `Verified-Preview` | §2b / §3b | **RESOLVED (Phase 7, 2026-07-08):** config-only swap → `gpt-5.4-mini` **87.5% (21/24)** vs flagship **91.7% (22/24)** at **~12% cost (~8× cheaper)**; within noise (paired Δ 95% CI [−12.5, 0.0] includes 0), **NOT a strict Pareto win**. Source: `eval/showdown/RESULTS.md`, `eval/scorecards/optimized_gpt-5.4-mini.*` |
 | C8 | Auth = delegated user identity; RBAC Foundry User + Project Manager | `Verified-Preview` | §1c / §2a | Service-principal Entra scopes are **Unverified** (Corrections #7, G2) |
 | C9 | Fabric IQ preview may incur cost / send data outside Azure compliance boundary | `Verified-Preview` | §2a | Real-data wiring gated behind approval (Art. VI/VII, G5); public demo uses synthetic fixtures |
+| C10 | **Cross-vendor model independence** — the identical harness with the reasoning/answer model swapped (config string only) to the **open-weights, non-GPT `Kimi-K2.6`** reaches **parity within noise** vs the `gpt-5.4` anchor at **lower USD cost** (same GlobalStandard SKU) | `Verified-by-test` (EPIC H) | §5a / §5b / §5c (+ `eval/showdown_xvendor/RESULTS.md`, `docs/cross-vendor-protocol.md`) | **87.5% (21/24) vs 91.7% (22/24)**; paired Δ **−4.2 pts, 95% CI [−12.5, 0.0] includes 0** (N=24); USD $/query **$0.006345 vs $0.006818**, $/correct **$0.007252 vs $0.007438**; groundedness 100%, refusals 6/6; single config hash `f9a15da1…` = enshrined Phase-7. **Say "parity within noise", not "beats"/"proves"; USD-only cost claim (different tokenizers → token counts informational only); no deployment-basis caveat (all GlobalStandard); N=24, anchor is a single run.** KB `answerSynthesis` on `gpt-5.4` stated **factually as config** (GPT-only platform surface, §5c), not a limitation |
 
 **Corrections to carry forward (do not reintroduce):** no `fabric_iq_connection` tool (use
 `fabric_iq_preview`); "MCP vs native" is a false dichotomy (native tool is built on MCP); azd extension is
@@ -255,6 +272,12 @@ Corrections #1–#8.)*
 **Publication gate (Art. VIII):** venue selection here is a *recommendation only*. Nothing is published, and
 the repo is **not** made public, without explicit user approval for that specific action. The repo stays
 **private** until the publication approval gate.
+
+**Scope note — Headline #2 now spans two results.** The model-independence headline (§4b / §S9) covers **both**
+the within-GPT-family swap (Phase 7: `gpt-5.4` ↔ `gpt-5.4-mini`) **and** the **cross-vendor** extension (EPIC H:
+the open-weights, non-GPT `Kimi-K2.6` at parity within noise and lower USD cost, `eval/showdown_xvendor/RESULTS.md`).
+The cross-vendor write-up is part of Headline #2 and, like the rest of the article, stays behind the Art. VIII
+publication gate.
 
 ### License restatement
 - **Code: MIT.**
