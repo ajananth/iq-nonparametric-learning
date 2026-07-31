@@ -10,6 +10,10 @@ This document **pre-registers** the hypothesis, comparison matrix, metrics, and 
 non-parametric SLM-vs-LLM experiment **before** any optimization is applied (Phase 6). Pre-registration
 guards against post-hoc metric-shopping: the criteria below are fixed now; Phase 6/7 report against them.
 
+> **Cross-vendor extension (EPIC H, #46).** The pre-registered protocol for extending this model-independence
+> result across **vendors** (open-weights, non-GPT reasoning model on the identical tuned harness) lives in
+> [`docs/cross-vendor-protocol.md`](cross-vendor-protocol.md).
+
 ---
 
 ## 1. Hypothesis
