@@ -137,6 +137,7 @@ def load_xvendor_pair() -> list[dict]:
                 "correct": agg["accuracy"]["correct"],
                 "n": agg["n_tasks"],
                 "cost_usd": agg["cost"]["total_usd"],
+                "cost_per_query": agg["cost"]["avg_per_task_usd"],
                 "cost_per_correct": agg["cost"]["cost_per_correct_usd"],
                 "pricing_verified": agg["cost"].get("pricing_verified", False),
             }
@@ -317,19 +318,38 @@ def chart_xvendor_accuracy_vs_cost(pair: list[dict]) -> None:
         )
 
     costs = [r["cost_usd"] for r in pair]
-    hi = max(costs)
-    # Honest, zero-based axes (issue #58 review): accuracy is a 0–100% metric and
-    # cost is a magnitude, so anchoring BOTH at 0 stops the truncated y-axis from
-    # exaggerating the 4.2-pt gap while a zoomed x-axis over-states the saving.
-    ax.set_xlim(0, hi * 1.18)
+    lo, hi = min(costs), max(costs)
+    span = (hi - lo) or hi * 0.1
+    # Different axis treatment by design (issue #58 review): accuracy stays 0-based
+    # (a small, statistically-indistinct gap should LOOK small), but cost is a
+    # volume-compounding ratio, so the x-axis keeps its zoomed data-range — the
+    # quantified, caveated caption below anchors the zoom to the true numbers so
+    # nothing is eyeballed.
+    ax.set_xlim(lo - span * 1.4, hi + span * 1.4)
     ax.set_ylim(0, 100)
     ax.set_xlabel("Total cost over the 24-Q held-out eval (USD — the comparable cross-vendor axis)")
     ax.set_ylabel("Accuracy (%)")
     ax.set_title("Cross-vendor swap: Kimi-K2.6 vs the gpt-5.4 anchor — parity within noise, cheaper $")
     ax.grid(True, linestyle=":", alpha=0.5)
     ax.legend(loc="lower left", fontsize=8, framealpha=0.9)
+
+    # Volume-invariant cost saving, computed at runtime from the two aggregates
+    # (Art. I — no hardcoding). anchor = gpt-5.4, other = kimi-k2.6.
+    by_model = {r["model"]: r for r in pair}
+    anchor = by_model["gpt-5.4"]
+    kimi = by_model["kimi-k2.6"]
+    pq = (anchor["cost_per_query"] - kimi["cost_per_query"]) / anchor["cost_per_query"] * 100
+    pc = (anchor["cost_per_correct"] - kimi["cost_per_correct"]) / anchor["cost_per_correct"] * 100
+    saved_1m = (anchor["cost_per_query"] - kimi["cost_per_query"]) * 1e6
+    cost_caption = (
+        f"Cost at listed placeholder rates (pricing.json verified:false): Kimi-K2.6 "
+        f"\u2248{pq:.1f}% cheaper per query and \u2248{pc:.1f}% cheaper per correct answer "
+        f"than gpt-5.4; the per-query ratio is volume-invariant \u2014 on this workload's "
+        f"token profile \u2248${saved_1m:,.0f} saved per 1M queries."
+    )
     fig.text(0.5, -0.03, XVENDOR_CI_CAVEAT + " " + PRICING_CAVEAT,
              ha="center", fontsize=7, color="#555")
+    fig.text(0.5, -0.07, cost_caption, ha="center", fontsize=6.5, color="#555")
     _finish(fig, ASSETS / "xvendor_accuracy_vs_cost.png")
 
 
