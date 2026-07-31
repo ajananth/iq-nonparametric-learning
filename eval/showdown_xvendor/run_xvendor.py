@@ -285,15 +285,18 @@ def _render_results(model: str, agg: dict[str, Any], tasks: list[dict[str, Any]]
         "`f9a15da1...` in this environment (same Azure AI Search resource as Phase-7), independently "
         "re-verifying the restored config tree — a bonus integrity win.",
         "",
-        "## Run provenance (honest correction — Art. I)",
+        "## Run integrity / cost (honest correction — Art. I)",
         "",
-        "The FIRST live attempt was **discarded before any result was interpreted**: the harness had "
+        "An initial live pass (~$0.21) was **discarded before any result was interpreted**: the harness had "
         "defaulted to the **baseline** config dir (hash `7486f0a5...`) instead of the enshrined **optimized** "
         "dir (`f9a15da1...`), which the runner's automated single-variable fairness assertion caught "
-        "(`config_hash != enshrined`). This is a config-dir setup bug, **not** a re-roll to fish for a "
-        "number (no result was read or published from it). The runner was fixed to pin `optimized/` "
+        "(`config_hash != enshrined`). This was a config-dir setup fix, **not** a re-roll to fish for a "
+        "better number (no result was read or published from it). The runner was fixed to pin `optimized/` "
         "explicitly and a **pre-spend hard guard** was added (STOP with zero spend if the optimized hash "
-        "!= enshrined `f9a15da1...`), then a single corrected pass was run — the one enshrined here.",
+        "!= enshrined `f9a15da1...`), then a single corrected pass was run — the one enshrined here (~$0.15). "
+        "**Cumulative spend ≈ $0.36, under the $2 ceiling** (Art. VIII). config_hash equals the enshrined "
+        "`f9a15da1...` in this environment (same Azure AI Search resource as Phase-7) — an end-to-end "
+        "confirmation of the #47 revert.",
         "",
         "## Isolation diagnostic — contested misses",
         "",
