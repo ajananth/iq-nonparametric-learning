@@ -301,12 +301,14 @@ def chart_xvendor_accuracy_vs_cost(pair: list[dict]) -> None:
         )
 
     leader = dict(arrowstyle="-", color="#888", lw=0.8, shrinkA=0, shrinkB=4)
+    # Both points sit high on the now zero-based y-axis, so anchor every label
+    # BELOW its marker to keep them clear of the top edge.
     point_labels = {
-        "gpt-5.4": dict(xytext=(14, 12), ha="left", va="bottom"),
-        "kimi-k2.6": dict(xytext=(-14, -30), ha="right", va="top"),
+        "gpt-5.4": dict(xytext=(10, -34), ha="left", va="top"),
+        "kimi-k2.6": dict(xytext=(-10, -34), ha="right", va="top"),
     }
     for r in pair:
-        off = point_labels.get(r["model"], dict(xytext=(12, 10), ha="left", va="bottom"))
+        off = point_labels.get(r["model"], dict(xytext=(10, -34), ha="left", va="top"))
         ax.annotate(
             f"{r['short']}\n{r['accuracy_pct']:.1f}%  ${r['cost_usd']:.6f}",
             (r["cost_usd"], r["accuracy_pct"]),
@@ -315,10 +317,12 @@ def chart_xvendor_accuracy_vs_cost(pair: list[dict]) -> None:
         )
 
     costs = [r["cost_usd"] for r in pair]
-    lo, hi = min(costs), max(costs)
-    span = (hi - lo) or hi * 0.1
-    ax.set_xlim(lo - span * 1.4, hi + span * 1.4)
-    ax.set_ylim(82, 97)
+    hi = max(costs)
+    # Honest, zero-based axes (issue #58 review): accuracy is a 0–100% metric and
+    # cost is a magnitude, so anchoring BOTH at 0 stops the truncated y-axis from
+    # exaggerating the 4.2-pt gap while a zoomed x-axis over-states the saving.
+    ax.set_xlim(0, hi * 1.18)
+    ax.set_ylim(0, 100)
     ax.set_xlabel("Total cost over the 24-Q held-out eval (USD — the comparable cross-vendor axis)")
     ax.set_ylabel("Accuracy (%)")
     ax.set_title("Cross-vendor swap: Kimi-K2.6 vs the gpt-5.4 anchor — parity within noise, cheaper $")
