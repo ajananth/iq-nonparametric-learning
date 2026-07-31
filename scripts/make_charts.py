@@ -185,13 +185,14 @@ def chart_accuracy_vs_cost(runs: list[dict]) -> None:
             label=f"{r['short']} · {r['model']}",
         )
 
-    # Per-point %/$ labels attached with short leader lines so grey vs blue
-    # (same 91.7%, nearly-equal cost) is unambiguous.
+    # Per-point %/$ labels attached with short leader lines. On the 0-based axis
+    # the three points cluster in the top band, so every label hangs BELOW its
+    # marker; grey vs blue (same 91.7%, near-equal cost) get left/right splits.
     leader = dict(arrowstyle="-", color="#888", lw=0.8, shrinkA=0, shrinkB=4)
     point_labels = {
-        "baseline": dict(xytext=(30, -34), ha="left", va="top"),
-        "optimized_llm": dict(xytext=(-18, -42), ha="right", va="top"),
-        "optimized_slm": dict(xytext=(20, 10), ha="left", va="bottom"),
+        "baseline": dict(xytext=(12, -30), ha="left", va="top"),
+        "optimized_llm": dict(xytext=(-12, -30), ha="right", va="top"),
+        "optimized_slm": dict(xytext=(0, -30), ha="center", va="top"),
     }
     for r in runs:
         off = point_labels[r["key"]]
@@ -203,38 +204,45 @@ def chart_accuracy_vs_cost(runs: list[dict]) -> None:
         )
 
     # Lever arrow 1 (Phase 6): grey -> blue. The two points nearly overlap, so
-    # draw a short curved connector lifted above them with its label in the
-    # empty upper-left area.
+    # draw a short curved connector lifted just above them; its label lives down
+    # in the now-large empty lower region with a leader line up to the arrow.
     ax.annotate(
         "", xy=(blue["cost_usd"], blue["accuracy_pct"] + 0.9),
         xytext=(grey["cost_usd"], grey["accuracy_pct"] + 0.9),
         arrowprops=dict(arrowstyle="->", color="#1f6fb4", lw=1.6,
                         connectionstyle="arc3,rad=-0.45"), zorder=5,
     )
-    ax.text(
-        (grey["cost_usd"] + blue["cost_usd"]) / 2 - 0.004, blue["accuracy_pct"] + 2.7,
+    xmax = max(r["cost_usd"] for r in runs) * 1.3
+    ax.annotate(
         "harness tuning (P6):\n−6.7% cost, same accuracy",
-        ha="center", va="bottom", fontsize=8, color="#1f6fb4",
+        xy=((grey["cost_usd"] + blue["cost_usd"]) / 2, blue["accuracy_pct"] + 1.5),
+        xytext=(xmax * 0.62, 46),
+        ha="center", va="center", fontsize=8, color="#1f6fb4",
+        arrowprops=dict(arrowstyle="-", color="#1f6fb4", lw=0.8, alpha=0.7),
     )
 
-    # Lever arrow 2 (Phase 7): blue -> green. Long diagonal (big cost cut,
-    # small accuracy drop).
+    # Lever arrow 2 (Phase 7): blue -> green. Long diagonal (big cost cut, small
+    # accuracy drop). Its label also sits in the lower region with a leader up to
+    # the mid-point of the diagonal.
     ax.annotate(
         "", xy=(green["cost_usd"], green["accuracy_pct"]),
         xytext=(blue["cost_usd"], blue["accuracy_pct"]),
         arrowprops=dict(arrowstyle="->", color="#2e9e5b", lw=1.6,
                         connectionstyle="arc3,rad=0.10"), zorder=5,
     )
-    ax.text(
-        0.072, 92.5,
+    ax.annotate(
         "model swap (P7):\n~8× cheaper, −4.2 pts",
-        ha="center", va="bottom", fontsize=8, color="#2e9e5b",
+        xy=((blue["cost_usd"] + green["cost_usd"]) / 2,
+            (blue["accuracy_pct"] + green["accuracy_pct"]) / 2 - 1.5),
+        xytext=(xmax * 0.30, 22),
+        ha="center", va="center", fontsize=8, color="#2e9e5b",
+        arrowprops=dict(arrowstyle="-", color="#2e9e5b", lw=0.8, alpha=0.7),
     )
 
     ax.set_xlabel("Total cost over the 24-Q held-out eval (USD)")
     ax.set_ylabel("Accuracy (%)")
     ax.set_title("Cutting cost at near-constant accuracy: harness tuning + model swap")
-    ax.set_ylim(82, 97)
+    ax.set_ylim(0, 100)
     ax.set_xlim(0, max(r["cost_usd"] for r in runs) * 1.3)
     ax.grid(True, linestyle=":", alpha=0.5)
     ax.legend(loc="lower right", fontsize=8, framealpha=0.9)
