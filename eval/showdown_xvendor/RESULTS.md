@@ -45,7 +45,7 @@ _Limitation (stated honestly, carried from H1): the paired bootstrap captures ju
 
 ## Run integrity / cost (honest correction — Art. I)
 
-An initial live pass (~$0.21) was **discarded before any result was interpreted**: the harness had defaulted to the **baseline** config dir (hash `7486f0a5...`) instead of the enshrined **optimized** dir (`f9a15da1...`), which the runner's automated single-variable fairness assertion caught (`config_hash != enshrined`). This was a config-dir setup fix, **not** a re-roll to fish for a better number (no result was read or published from it). The runner was fixed to pin `optimized/` explicitly and a **pre-spend hard guard** was added (STOP with zero spend if the optimized hash != enshrined `f9a15da1...`), then a single corrected pass was run — the one enshrined here (~$0.15). **Cumulative spend ≈ $0.36, under the $2 ceiling** (Art. VIII). config_hash equals the enshrined `f9a15da1...` in this environment (same Azure AI Search resource as Phase-7) — an end-to-end confirmation of the #47 revert.
+An initial live pass (≈$0.21) was **discarded before any result was interpreted**: the harness had defaulted to the **baseline** config dir (hash `7486f0a5...`) instead of the enshrined **optimized** dir (`f9a15da1...`), which the runner's automated single-variable fairness assertion caught (`config_hash != enshrined`). This was a config-dir setup fix, **not** a re-roll to fish for a better number (no result was read or published from it). The runner was fixed to pin `optimized/` explicitly and a **pre-spend hard guard** was added (STOP with zero spend if the optimized hash != enshrined `f9a15da1...`), then a single corrected pass was run — the one enshrined here (≈$0.15). **Cumulative spend ≈ $0.36, under the $2 ceiling** (Art. VIII). config_hash equals the enshrined `f9a15da1...` in this environment (same Azure AI Search resource as Phase-7) — an end-to-end confirmation of the #47 revert.
 
 ## Isolation diagnostic — contested misses
 
@@ -56,7 +56,7 @@ An initial live pass (~$0.21) was **discarded before any result was interpreted*
 ## Verdict (honest, pre-registered — cross-vendor-protocol.md §5)
 
 1. **Accuracy within noise of the anchor:** MET (paired-delta 95% CI includes 0).
-2. **Groundedness ~100%:** MET (100.0% KB-retrieve).
+2. **Groundedness ≈100%:** MET (100.0% KB-retrieve).
 3. **Refusals preserved:** MET (6/6 negatives).
 4. **USD cost vs gpt-5.4:** $0.152285 total / $0.007252 per-correct vs $0.163643 / $0.007438 — reduction MET.
 
