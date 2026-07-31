@@ -299,45 +299,30 @@ honest story.
 
 ### Cross-vendor extension — the same harness on Kimi-K2.6
 
-The Phase-7 swap moved between two **OpenAI** models. EPIC H asks the harder question: does the independence
-hold **across vendors**? We ran the **identical, unmodified** tuned harness — same `f9a15da1…` config hash,
-`fine_tuning=false` — with the **reasoning/answer model** (the "brain" that reads the grounded rows, resolves
-the multi-hop question, and writes the answer) swapped to the **open-weights, non-GPT `Kimi-K2.6`** (Moonshot
-AI, GlobalStandard SKU). The **only** variable moved vs the `gpt-5.4` anchor is the reasoning-model deployment
-string `gpt-5.4 → kimi-k2.6`. *(EPIC H; [`eval/showdown_xvendor/RESULTS.md`](./eval/showdown_xvendor/RESULTS.md),
-pre-registered in [`docs/cross-vendor-protocol.md`](./docs/cross-vendor-protocol.md).)*
+The Phase-7 swap moved between two **OpenAI** models. EPIC H asks the harder question: does the independence hold **across vendors**? We ran the **identical, unmodified** tuned harness — same `f9a15da1…` config hash, `fine_tuning=false` — with the **reasoning/answer model** (the "brain" that reads the grounded rows, resolves the multi-hop question, and writes the answer) swapped to the **open-weights, non-GPT `Kimi-K2.6`** (Moonshot AI, GlobalStandard SKU). The **only** variable moved vs the `gpt-5.4` anchor is the reasoning-model deployment string `gpt-5.4 → kimi-k2.6`. *(EPIC H; [`eval/showdown_xvendor/RESULTS.md`](./eval/showdown_xvendor/RESULTS.md), pre-registered in [`docs/cross-vendor-protocol.md`](./docs/cross-vendor-protocol.md).)*
 
-- **Accuracy — parity within noise (the pre-registered success condition):** Kimi-K2.6 **87.5% (21/24)** vs
-  the `gpt-5.4` anchor **91.7% (22/24)**; paired bootstrap delta **−4.2 pts, 95% CI [−12.5, 0.0] — includes 0**
-  (10,000 resamples, N=24). The CI including 0 means the two are **statistically indistinguishable on this
-  held-out set** — a within-noise result, which is the success for cross-vendor model independence (not a claim
-  that Kimi is better; it is not).
-- **Cost — cheaper in USD on every axis:** both models are on the **same GlobalStandard SKU**, so dollars are
-  directly comparable (no deployment-basis caveat). Kimi-K2.6 vs the `gpt-5.4` anchor: **total $0.152285 vs
-  $0.163643**, **$/query $0.006345 vs $0.006818**, **$/correct $0.007252 vs $0.007438** — lower on all three
-  (Kimi GlobalStandard rates $0.95/M in · $4.00/M out · $0.16/M cached, verified-capabilities §5b).
-  *Token counts are per-model informational only — Kimi and GPT use different tokenizers, so a token is not a
-  like-for-like unit; the comparable cross-model axis is USD.*
-- **Grounding & refusals preserved:** groundedness **100%** (the harness-enforced KB retrieve fires on every
-  task, so grounding never depends on the model's parametric knowledge) and safe refusals **6/6** on the
-  negatives — carried across the vendor boundary unchanged.
-- **Single-variable control:** a **single shared config hash `f9a15da1…`** across all 24 tasks, and it **equals
-  the enshrined Phase-7 hash** — the auditable proof that only the model moved.
-- **The three misses are model-independent:** S01 and M06 are the enshrined misses the flagship **also** gets
-  wrong (zero model-attributable gap); M10 is the documented retrieval column-projection / set-completeness
-  variance that would break the flagship identically. **Honest limitation (from `RESULTS.md`):** N=24, and the
-  `gpt-5.4` anchor is itself a single stochastic run carrying the same ±1 multi-hop retrieval variance — the
-  gap is not a fixed model property.
-- **On KB answer-synthesis (stated factually, not a limitation):** the Azure AI Search Knowledge Base
-  `answerSynthesis` step is a **GPT-family-only** surface by platform design (an enforced allow-list;
-  verified-capabilities §5c), so it stays on `gpt-5.4` here. That is a fixed property of the **retrieval /
-  grounding** path, held byte-identical across every model in the study — it is **not** the reasoning agent.
-  The cross-vendor claim rides on the model doing the reasoning and emitting the answer, which **is** Kimi-K2.6.
+**USD is the comparable cross-vendor axis** (Kimi-K2.6 and gpt-5.4 use different tokenizers, so tokens are **not** a like-for-like unit across them — see the token note below). Both models are on the GlobalStandard SKU, so dollars are measured on the same basis.
 
-**The reading:** Headline #2 levels up from within-GPT-family to **cross-vendor** — an open-weights model that
-shares no lineage, tokenizer, or training pipeline with GPT reaches the **same answers** on the **same grounded
-harness** with a **config-string-only swap**, for **less money**. That is the non-parametric-learning thesis
-holding past the vendor boundary.
+| Model | Accuracy | Cost (USD total) | $/query | $/correct | Grounded | Refusals |
+| --- | --- | --- | --- | --- | --- | --- |
+| `gpt-5.4` (anchor) | 91.7% (22/24) | $0.163643 | $0.006818 | $0.007438 | 100% | 6/6 |
+| `kimi-k2.6` | 87.5% (21/24) | **$0.152285** | **$0.006345** | **$0.007252** | 100% | 6/6 |
+
+**Paired accuracy Δ (Kimi − gpt-5.4): −4.2 pts, 95% CI [−12.5, 0.0] — includes 0** (10k resamples, N=24) → **parity within noise**, the pre-registered cross-vendor success criterion (statistically indistinguishable on this held-out set — not a claim that Kimi is better; it is not). Kimi-K2.6 is **cheaper than the flagship on all three cost measures** while holding 100% groundedness and 6/6 safe refusals. The honest headline is **"parity within noise + cheaper than the flagship,"** *not* "8× cheaper" — that ~8× figure is the same-vendor `gpt-5.4-mini` story above (flagship-tier Kimi-K2.6 at $0.152285 is ~7× dearer than the ~$0.021 mini).
+
+Because per-query cost is volume-invariant, the modest per-query gap compounds at enterprise scale: **~6.9% cheaper per query** (~2.5% per correct answer) ≈ **$473 saved per 1M queries** on this workload's token profile, at placeholder rates (`eval/pricing.json` `verified:false`).
+
+<p align="center">
+  <img src="docs/assets/xvendor_accuracy_vs_cost.png" alt="Cross-vendor accuracy vs USD cost — Kimi-K2.6 vs the gpt-5.4 anchor" width="72%">
+</p>
+
+_Token note (informational only, per model — **not** a cross-model comparison): Kimi-K2.6 90,822 in / 16,501 out; gpt-5.4 anchor 97,226 in / 4,211 out. These are **not tokenizer-normalized** and must not be read as a cross-vendor efficiency claim; the comparable axis is USD. Costs use `eval/pricing.json` (`verified:false`) — placeholder rates; the conclusions ride the ratio, not the absolute $._
+
+**Single-variable control & honest limitations:** a **single shared config hash `f9a15da1…`** across all 24 tasks **equals the enshrined Phase-7 hash** — the auditable proof that only the model moved. The three misses are **model-independent**: S01 and M06 are the enshrined misses the flagship **also** gets wrong (zero model-attributable gap); M10 is the documented retrieval column-projection / set-completeness variance that would break the flagship identically. **N=24**, and the `gpt-5.4` anchor is itself a single stochastic run carrying the same ±1 multi-hop retrieval variance — the gap is not a fixed model property.
+
+**On KB answer-synthesis (stated factually, not a limitation):** the Azure AI Search Knowledge Base `answerSynthesis` step is a **GPT-family-only** surface by platform design (an enforced allow-list; verified-capabilities §5c), so it stays on `gpt-5.4` here. That is a fixed property of the **retrieval / grounding** path, held byte-identical across every model in the study — it is **not** the reasoning agent. The cross-vendor claim rides on the model doing the reasoning and emitting the answer, which **is** Kimi-K2.6.
+
+**The reading:** Headline #2 levels up from within-GPT-family to **cross-vendor** — an open-weights model that shares no lineage, tokenizer, or training pipeline with GPT reaches the **same answers** on the **same grounded harness** with a **config-string-only swap**, for **less money**. That is the non-parametric-learning thesis holding past the vendor boundary.
 
 ## S10. Takeaways & how to run it
 
