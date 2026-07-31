@@ -451,3 +451,111 @@ beta tooling defects in §3d (brownfield `azd provision` template failure; non-i
 resolution defect — run `optimize` interactively for now); and (c) exercise end-to-end candidate scoring in Phase 6
 (the spike proved submission/queue/execution-start but cancelled before scoring). Per **Art. XIII**, no Phase 1+
 build work should begin until this note is merged.
+
+---
+
+## 5. Kimi-K2.6 model addendum — cross-vendor model independence
+
+> **Issue:** #49 (EPIC H, #46) · **Status:** ADDENDUM · **Verification date:** **2026-07-31**
+> **Author:** H-3 child session · **Governs:** Constitution Art. I (Accuracy & Verification),
+> Art. III (Model Independence).
+
+This addendum extends the Phase 0 note for **EPIC H** — running **Kimi-K2.6** as the reasoning model on the
+tuned harness to demonstrate cross-vendor model independence. It is **additive** and does not alter §1–§4 or any
+enshrined Phase 5–7 artifact. Every claim carries a primary Microsoft/Azure citation; live catalog/price
+observations are marked **verified-by-test 2026-07-31** and are reproducible with the read-only commands shown.
+
+### 5a. Kimi-K2.6 catalog facts — `Verified-Preview` (verified-by-test 2026-07-31)
+
+Observed via the read-only Azure control-plane command
+`az cognitiveservices model list -l eastus2` (re-run on the verification date; filtered to the Kimi family). The
+`Kimi-K2.6` entry reports:
+
+| Attribute | Value |
+| --- | --- |
+| Model id / name | `Kimi-K2.6` |
+| Version | `2026-04-20` |
+| Format (provider) | `MoonshotAI` |
+| Deployment `kind` | `AIServices` |
+| `systemData.createdBy` | `Microsoft` (`createdByType: Application`) |
+| SKU / usage name | `GlobalStandard` / `AIServices.GlobalStandard.Kimi-K2.6` |
+| Capabilities | `chatCompletion: true`, `agentsV2: true` |
+| Lifecycle status | `Preview` |
+| Inference deprecation | `2027-04-16` |
+
+- **Direct-from-Azure / inside the Azure compliance boundary.** `kind=AIServices` + `createdBy=Microsoft` +
+  a `AIServices.GlobalStandard.*` usage meter identify Kimi-K2.6 as a **Foundry Model sold directly by Azure**
+  (the "azure-direct-others" collection), i.e. **hosted and operated by Azure, billed through the Azure
+  subscription, and covered by Azure SLAs** — the requests do not leave the Azure boundary the way a BYO
+  third-party endpoint would. This is the same delivery model our gpt-5.4 deployments use, which is what makes
+  a like-for-like cross-vendor comparison sound (**Art. III**).
+- **`agentsV2: true`** confirms Kimi-K2.6 is usable as an Agent Service reasoning model (not chat-only), which is
+  required for the tuned harness.
+
+**Primary sources (accessed 2026-07-31):**
+- Foundry Models sold by Azure (defines the "sold/hosted/operated by Azure", in-boundary category) —
+  https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure *(updated 2026-07-23)*
+- Foundry Models overview (Azure-sold vs partner/community categories) —
+  https://learn.microsoft.com/en-us/azure/foundry-classic/concepts/foundry-models-overview *(updated 2026-07-28)*
+- Live control-plane read: `az cognitiveservices model list -l eastus2` (Azure CLI, read-only), verified-by-test 2026-07-31.
+
+### 5b. Pricing — **RE-VERIFIED on the GlobalStandard SKU** (the crux) — verified-by-test 2026-07-31
+
+The deployment we actually use is **GlobalStandard** (usage meter `AIServices.GlobalStandard.Kimi-K2.6` — the same
+SKU family as gpt-5.4 / gpt-5.4-mini). An earlier lead quoted **input $1.045/M · output $4.40/M · cached $0.176/M**,
+but those figures are a **Data-Zone (DZ)** meter — specifically the `FW Kimi K2.6 … DZ` family (`Inp` $0.001045/1K,
+`Outp` $0.0044/1K = $4.40/M, `Cache Inp` $0.000176/1K), **not** the GlobalStandard SKU we deployed. Recording the DZ
+price against a GlobalStandard deployment would make the cost axis **not** like-for-like with the gpt-5.4 rates in
+`eval/pricing.json`.
+
+Re-queried the **public, unauthenticated Azure Retail Prices API** (`https://prices.azure.com/api/retail/prices`,
+no auth, no cost) filtered to `armRegionName eq 'eastus2'` and Kimi-K2.6 meters. **A GlobalStandard ("glbl") meter
+does exist** for Kimi-K2.6, and it is the correct like-for-like price:
+
+| Token type | **GlobalStandard (deployed SKU)** | Data-Zone (earlier-lead SKU) |
+| --- | --- | --- |
+| Input | **$0.95 / M** — `K2.6 Thinking Inp glbl` ($0.00095/1K) | $1.045/M — `K2.6 Thinking Inp DZ` / `FW Kimi K2.6 Inp DZ` |
+| Output | **$4.00 / M** — `K2.6 Thinking Outp glbl` ($0.004/1K) | $5.00/M (`… Outp DZ`) · $4.40/M (`FW Kimi K2.6 Outp DZ`, $0.0044/1K) |
+| Cached input | **$0.16 / M** — `K2.6 cached glbl` ($0.00016/1K) | $0.176/M — `K2.6 cached DZ` / `FW Kimi K2.6 Cache Inp DZ` |
+
+- **Recorded GlobalStandard rate (use this for cost comparison):** **input $0.95/M · output $4.00/M · cached
+  input $0.16/M**, currency USD, region `eastus2` (East US 2), meter type `Consumption`.
+- **Exact meters (region `eastus2`, from the Retail Prices API):**
+  - `K2.6 Thinking Inp glbl` — meterId `54ca4f6d-a381-57c5-b63b-088873066d58`, $0.00095/1K, effective **2026-05-01**.
+  - `K2.6 Thinking Outp glbl` — meterId `92c16b59-79b2-58e6-a181-c73e53b41d31`, $0.004/1K, effective **2026-05-01**.
+  - `K2.6 cached glbl` — meterId `061f7281-e2b9-556e-93f2-c01f494e22c7`, $0.00016/1K, effective **2026-07-01**.
+- **The GlobalStandard SKU is *cheaper* than the DZ figures the earlier lead recorded** (input −9%, output −9%
+  vs the $4.40 FW-DZ output). The correction moves the recorded price onto the SKU we deployed and keeps the
+  cost axis like-for-like with gpt-5.4 / gpt-5.4-mini (**Art. I**, **Art. III**). These are **operator-verified
+  retail rates**; `eval/pricing.json` remains an operator-supplied pricing input (its own `verified:false` caveat
+  stands) and is intentionally not modified by this doc-only change.
+
+**Primary sources (accessed 2026-07-31):**
+- Azure Retail Prices REST API (public, unauthenticated) —
+  https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices *(updated 2026-01-06)*
+- Live query (read-only, no cost):
+  `GET https://prices.azure.com/api/retail/prices?$filter=armRegionName eq 'eastus2' and contains(meterName, 'K2.6')`, verified-by-test 2026-07-31.
+
+### 5c. Knowledge Base `answerSynthesis` supported models — factual capability note (neutral)
+
+Azure AI Search Knowledge Base **`answerSynthesis`** (agentic retrieval, `2026-05-01-preview`) accepts an LLM for
+answer synthesis **only from the Azure OpenAI GPT family**. The platform enforces this with an allow-list; supplying
+a non-GPT `models[].deploymentId` returns HTTP **400** with the verbatim message:
+
+> `Unsupported model type in Knowledge Base Model Configuration. ModelName must be either gpt-4o, gpt-4o-mini,`
+> `gpt-4.1-nano, gpt-4.1-mini, gpt-4.1, gpt-5, gpt-5-mini, gpt-5-nano, gpt-5.1, gpt-5.2, gpt-5.4, gpt-5.4-mini,`
+> `gpt-5.4-nano, gpt-5.5.`
+
+The Microsoft Learn "Create a Knowledge Base" doc lists the same GPT-only set as the supported synthesis models
+(`gpt-4o … gpt-5.4-nano`; the runtime allow-list additionally accepts `gpt-5.5`).
+
+- **This is a platform capability fact, not a limitation of our approach.** KB answer-synthesis is a
+  GPT-family-only surface by design; it is independent of which model does the *reasoning*. Our cross-vendor
+  harness therefore runs **KB synthesis on `gpt-5.4`** (an allow-listed GPT model) while the **reasoning model is
+  Kimi-K2.6**. The split is expected and consistent with the documented platform behavior — the reasoning model's
+  vendor-independence (**Art. III**) is unaffected by the synthesis model's allow-list.
+
+**Primary sources (accessed 2026-07-31):**
+- Create a Knowledge Base — Azure AI Search (§ *Supported models*; `2026-05-01-preview`) —
+  https://learn.microsoft.com/en-us/azure/search/agentic-retrieval-how-to-create-knowledge-base *(updated 2026-07-02)*
+- Observed runtime allow-list: verbatim `400` from the KB model-configuration validation (agentic retrieval `2026-05-01-preview`), verified-by-test.
