@@ -15,9 +15,10 @@ Usage::
     python scripts/make_charts.py --check    # fail if committed PNGs are missing/stale
 
 Outputs (docs/assets/):
-    accuracy_vs_cost.png       (a) accuracy vs total cost across the 3 runs (two cost levers)
-    cost_per_correct.png       (b) cost-per-correct-answer bar
-    token_totals.png           (c) total tokens (Phase-6 trim + Phase-7 swap), in/out split
+    accuracy_vs_cost.png            (a) accuracy vs total cost across the 3 runs (two cost levers)
+    cost_per_correct.png            (b) cost-per-correct-answer bar
+    token_totals.png                (c) total tokens (Phase-6 trim + Phase-7 swap), in/out split
+    xvendor_accuracy_vs_cost.png    (d) cross-vendor: Kimi-K2.6 vs the gpt-5.4 anchor (H-6, #58)
 
 Pricing note (Art. I): ``eval/pricing.json`` is ``verified:false`` — the absolute dollar
 figures are operator-supplied placeholders. The conclusions ride the *ratio* between models,
@@ -39,6 +40,11 @@ import matplotlib.pyplot as plt  # noqa: E402
 REPO = Path(__file__).resolve().parents[1]
 SCORECARDS = REPO / "eval" / "scorecards"
 SHOWDOWN = REPO / "eval" / "showdown" / "RESULTS.md"
+# Cross-vendor scorecard merged by H-4 (#50): the tuned harness re-run with the
+# reasoning/answer model swapped to the open-weights, non-GPT Kimi-K2.6 (Art. VII —
+# read byte-identical, never mutated here).
+XVENDOR_KIMI = REPO / "eval" / "showdown_xvendor" / "xvendor_kimi-k2.6.json"
+XVENDOR_ANCHOR = SCORECARDS / "optimized_gpt-5.4.json"
 ASSETS = REPO / "docs" / "assets"
 
 # The three enshrined runs, in narrative order (Phase 5 -> 6 -> 7).
@@ -70,6 +76,7 @@ OUTPUTS = [
     "accuracy_vs_cost.png",
     "cost_per_correct.png",
     "token_totals.png",
+    "xvendor_accuracy_vs_cost.png",
 ]
 
 
@@ -95,6 +102,46 @@ def load_runs() -> list[dict]:
             }
         )
     return runs
+
+
+def load_xvendor_pair() -> list[dict]:
+    """Read the H-6 cross-vendor pair: Kimi-K2.6 vs the enshrined gpt-5.4 anchor.
+
+    Both scorecards share the same ``aggregate`` schema, so every plotted number is
+    pulled straight from the committed JSON at runtime (Art. I) — nothing hardcoded.
+    The gpt-5.4 anchor is the enshrined Phase-7 Optimized-LLM run; Kimi-K2.6 is the
+    identical tuned harness with only the reasoning/answer deployment string swapped.
+    """
+    specs = [
+        {
+            "path": XVENDOR_ANCHOR,
+            "short": "gpt-5.4 (anchor)",
+            "color": "#1f6fb4",
+            "marker": "o",
+        },
+        {
+            "path": XVENDOR_KIMI,
+            "short": "kimi-k2.6",
+            "color": "#c0504d",
+            "marker": "s",
+        },
+    ]
+    pair = []
+    for spec in specs:
+        agg = json.loads(spec["path"].read_text(encoding="utf-8"))["aggregate"]
+        pair.append(
+            {
+                **spec,
+                "model": agg["model"],
+                "accuracy_pct": agg["accuracy"]["overall_pct"],
+                "correct": agg["accuracy"]["correct"],
+                "n": agg["n_tasks"],
+                "cost_usd": agg["cost"]["total_usd"],
+                "cost_per_correct": agg["cost"]["cost_per_correct_usd"],
+                "pricing_verified": agg["cost"].get("pricing_verified", False),
+            }
+        )
+    return pair
 
 
 def showdown_config_hash() -> str | None:
@@ -233,8 +280,58 @@ def chart_token_totals(runs: list[dict]) -> None:
     _finish(fig, ASSETS / "token_totals.png")
 
 
+# H-6 (#58): dedicated cross-vendor view. USD is the only like-for-like axis across
+# vendors (Kimi-K2.6 and gpt-5.4 use different tokenizers, so tokens are NOT comparable
+# and deliberately do not appear here). The headline is "parity within noise + cheaper
+# than the flagship," never "8× cheaper" (that is the same-vendor gpt-5.4-mini story).
+XVENDOR_CI_CAVEAT = (
+    "Paired accuracy Δ (Kimi − gpt-5.4) −4.2 pts, 95% CI [−12.5, 0.0] includes 0 "
+    "(10k resamples, N=24) — parity within noise."
+)
+
+
+def chart_xvendor_accuracy_vs_cost(pair: list[dict]) -> None:
+    fig, ax = plt.subplots(figsize=(7.6, 5.0))
+
+    for r in pair:
+        ax.scatter(
+            r["cost_usd"], r["accuracy_pct"], s=200, color=r["color"],
+            marker=r["marker"], edgecolors="white", linewidths=1.5, zorder=4,
+            label=f"{r['short']} · {r['accuracy_pct']:.1f}% ({r['correct']}/{r['n']})",
+        )
+
+    leader = dict(arrowstyle="-", color="#888", lw=0.8, shrinkA=0, shrinkB=4)
+    point_labels = {
+        "gpt-5.4": dict(xytext=(14, 12), ha="left", va="bottom"),
+        "kimi-k2.6": dict(xytext=(-14, -30), ha="right", va="top"),
+    }
+    for r in pair:
+        off = point_labels.get(r["model"], dict(xytext=(12, 10), ha="left", va="bottom"))
+        ax.annotate(
+            f"{r['short']}\n{r['accuracy_pct']:.1f}%  ${r['cost_usd']:.6f}",
+            (r["cost_usd"], r["accuracy_pct"]),
+            textcoords="offset points", fontsize=8.5, color="#222",
+            arrowprops=leader, **off,
+        )
+
+    costs = [r["cost_usd"] for r in pair]
+    lo, hi = min(costs), max(costs)
+    span = (hi - lo) or hi * 0.1
+    ax.set_xlim(lo - span * 1.4, hi + span * 1.4)
+    ax.set_ylim(82, 97)
+    ax.set_xlabel("Total cost over the 24-Q held-out eval (USD — the comparable cross-vendor axis)")
+    ax.set_ylabel("Accuracy (%)")
+    ax.set_title("Cross-vendor swap: Kimi-K2.6 vs the gpt-5.4 anchor — parity within noise, cheaper $")
+    ax.grid(True, linestyle=":", alpha=0.5)
+    ax.legend(loc="lower left", fontsize=8, framealpha=0.9)
+    fig.text(0.5, -0.03, XVENDOR_CI_CAVEAT + " " + PRICING_CAVEAT,
+             ha="center", fontsize=7, color="#555")
+    _finish(fig, ASSETS / "xvendor_accuracy_vs_cost.png")
+
+
 def build(check: bool) -> int:
     runs = load_runs()
+    xvendor = load_xvendor_pair()
     cfg = showdown_config_hash()
     print("Loaded scorecards (exact figures from committed JSON):")
     for r in runs:
@@ -242,6 +339,11 @@ def build(check: bool) -> int:
               f"acc={r['accuracy_pct']:.1f}% ({r['correct']}/{r['n']}) "
               f"tok={r['tokens_total']:,} cost=${r['cost_usd']:.6f} "
               f"$/correct=${r['cost_per_correct']:.6f}")
+    print("Cross-vendor pair (H-6, USD-only comparison):")
+    for r in xvendor:
+        print(f"  {r['short']:<16} {r['model']:<13} "
+              f"acc={r['accuracy_pct']:.1f}% ({r['correct']}/{r['n']}) "
+              f"cost=${r['cost_usd']:.6f} $/correct=${r['cost_per_correct']:.6f}")
     if cfg:
         print(f"  Phase-7 single shared config hash: {cfg[:16]}\u2026 (model = sole variable)")
 
@@ -257,6 +359,7 @@ def build(check: bool) -> int:
     chart_accuracy_vs_cost(runs)
     chart_cost_per_correct(runs)
     chart_token_totals(runs)
+    chart_xvendor_accuracy_vs_cost(xvendor)
     print("Done.")
     return 0
 
